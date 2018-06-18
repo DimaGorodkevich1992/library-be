@@ -2,7 +2,6 @@ package com.intexsoft.service;
 
 import com.intexsoft.model.Book;
 import com.intexsoft.model.Library;
-import com.intexsoft.model.LibraryBook;
 import com.intexsoft.repository.LibraryBookRepository;
 import com.intexsoft.repository.LibraryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,7 @@ import rx.schedulers.Schedulers;
 import java.util.UUID;
 
 @Service
-public class LibraryService extends CommonService<Library, UUID> {
+public class LibraryService extends CommonService<Library, UUID, Library> {
 
     @Autowired
     private LibraryBookRepository libraryBookRepository;
@@ -21,7 +20,7 @@ public class LibraryService extends CommonService<Library, UUID> {
     @Autowired
     private LibraryRepository repositoryLibrary;
 
-    public Observable<Library> searchLibrary(String name, String address) {  //todo
+    public Observable<Library> searchLibrary(String name, String address) {  
         return Observable.from(repositoryLibrary.searchLibrary(name,address))
                 .subscribeOn(Schedulers.io());
     }

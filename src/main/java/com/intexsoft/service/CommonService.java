@@ -8,10 +8,10 @@ import rx.schedulers.Schedulers;
 
 import java.util.Objects;
 
-public abstract class CommonService<E extends CommonModel<I>, I> {
+public abstract class CommonService<E extends CommonModel<I, T>, I, T extends CommonModel<I, T>> {
 
     @Autowired
-    private CommonRepository<E, I> repository;
+    private CommonRepository<E, I, T> repository;
 
     protected abstract I getGeneratedId();
 

@@ -5,7 +5,7 @@ import com.intexsoft.model.CommonModel;
 import java.util.List;
 import java.util.Map;
 
-public interface CommonRepository<E extends CommonModel<I>,I> {
+public interface CommonRepository<E extends CommonModel<I, T>, I, T extends CommonModel<I, T>> {
     E getById(I id);
 
     E save(E e);

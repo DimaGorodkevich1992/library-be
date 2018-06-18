@@ -12,10 +12,12 @@ import javax.persistence.Version;
 @EqualsAndHashCode
 @Accessors(chain = true)
 @MappedSuperclass
-public abstract class CommonModel<I> {
+public abstract class CommonModel<I, T extends CommonModel<I, T>> {
 
-    public abstract void setId(I i);
-    public abstract I getId();
     @Version
     private long version;
+
+    public abstract T setId(I id);
+
+    public abstract I getId();
 }

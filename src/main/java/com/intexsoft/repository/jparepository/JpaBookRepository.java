@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbJpa", matchIfMissing = false)
-public class JpaBookRepository extends JpaCommonRepository<Book, UUID> implements BookRepository {
+public class JpaBookRepository extends JpaCommonRepository<Book, UUID, Book> implements BookRepository {
     @Autowired
     private LibraryBookRepository libraryBookRepository;
     @Override

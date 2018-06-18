@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbJpa", matchIfMissing = false)
-public class JpaLibraryRepository extends JpaCommonRepository<Library, UUID> implements LibraryRepository {
+public class JpaLibraryRepository extends JpaCommonRepository<Library, UUID, Library> implements LibraryRepository {
 
     protected Class<Library> getModelClass() {
         return Library.class;

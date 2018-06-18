@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Objects;
 
 
-public abstract class JpaCommonRepository<E extends CommonModel<I>, I> implements CommonRepository<E, I> {
+public abstract class JpaCommonRepository<E extends CommonModel<I, T>, I, T extends CommonModel<I, T>> implements CommonRepository<E, I, T> {
 
     @Autowired
     private EntityManager em;

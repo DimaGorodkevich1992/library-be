@@ -6,11 +6,10 @@ import java.util.List;
 import java.util.UUID;
 
 
-public interface BookRepository extends CommonRepository<Book,UUID>{
+public interface BookRepository extends CommonRepository<Book, UUID, Book> {
 
 
     List<Book> searchBook(String name, String author);
-
 
 
 }

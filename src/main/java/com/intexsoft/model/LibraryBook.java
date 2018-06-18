@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Accessors(chain = true)
 @Entity
 @Table(name = "books_libraries")
-public class LibraryBook extends CommonModel<LibraryBookId> {
+public class LibraryBook extends CommonModel<LibraryBookId,LibraryBook> {
     @EmbeddedId
     private LibraryBookId id;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -21,13 +21,5 @@ public class LibraryBook extends CommonModel<LibraryBookId> {
     @JoinColumn(name = "library_id", insertable = false, updatable = false)
     private Library library;
 
-    @Override
-    public void setId(LibraryBookId libraryBookId) {
-        this.id = libraryBookId;
-    }
 
-    @Override
-    public LibraryBookId getId() {
-        return id;
-    }
 }
