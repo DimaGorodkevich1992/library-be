@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import rx.Subscription;
+import rx.functions.Action1;
 
 import java.util.List;
 import java.util.UUID;

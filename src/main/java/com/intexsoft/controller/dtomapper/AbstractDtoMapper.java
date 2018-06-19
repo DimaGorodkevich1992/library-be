@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 
 @Slf4j
-public abstract class AbstractDtoMapper<E extends CommonModel<I>, D extends CommonDto<I>, I> {
+public abstract class AbstractDtoMapper<E extends CommonModel<I, T>, D extends CommonDto<I>, I, T extends CommonModel<I, T>> {
 
     protected abstract Class<E> getEntityClass();
 

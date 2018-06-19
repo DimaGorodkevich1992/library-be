@@ -9,7 +9,7 @@ import java.util.UUID;
 
 
 @Component
-public class BookDtoMapper extends AbstractDtoMapper<Book, BookDto,UUID> {
+public class BookDtoMapper extends AbstractDtoMapper<Book, BookDto, UUID, Book> {
 
     @Override
     protected void instructionToDto(Book entity, BookDto dto) {

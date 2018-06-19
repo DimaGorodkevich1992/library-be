@@ -4,13 +4,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import java.util.ArrayList;
+import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -27,7 +24,8 @@ public class Book extends CommonModel<UUID, Book> {
     private String author;
     @Column(name = "number_pages")
     private Integer numberPages;
-    private List<LibraryBook> libraries = new ArrayList<>();
+    @OneToMany(mappedBy = "book")
+    private Set<LibraryBook> libraries = new HashSet<>();
 
     @Override
     public UUID getId() {

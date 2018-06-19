@@ -6,12 +6,13 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @Entity
 @Table(name = "books_libraries")
-public class LibraryBook extends CommonModel<LibraryBookId,LibraryBook> {
+public class LibraryBook extends CommonModel<LibraryBookId, LibraryBook> {
     @EmbeddedId
     private LibraryBookId id;
     @ManyToOne(fetch = FetchType.LAZY)

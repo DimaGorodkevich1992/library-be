@@ -1,26 +1,27 @@
 package com.intexsoft.model;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 @Entity
 @Table(name = "libraries")
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
-public class Library extends CommonModel<UUID,Library> {
+public class Library extends CommonModel<UUID, Library> {
     @Id
     @Column(name = "id")
     private UUID id;
     private String name;
     private String address;
+    @OneToMany(mappedBy = "library")
+    private Set<LibraryBook> books = new HashSet<>();
 
     @Override
     public UUID getId() {

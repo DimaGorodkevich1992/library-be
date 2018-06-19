@@ -43,6 +43,11 @@ public class JpaLibraryBookRepository extends JpaCommonRepository<LibraryBook, L
     }
 
 
+    @Override
+    public LibraryBook getById(LibraryBookId id) {
+        return null;
+    }
+
     private <E, C> List<E> searchAttachment(C criteriaForSearchEntity, Class<E> attachment, String joinToName, String joinFromName) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<E> query = cb.createQuery(attachment);

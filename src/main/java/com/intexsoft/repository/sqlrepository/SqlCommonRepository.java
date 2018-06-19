@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public abstract class SqlCommonRepository<E extends CommonModel<I>, I> implements CommonRepository<E, I> {
+public abstract class SqlCommonRepository<E extends CommonModel<I, T>, I, T extends CommonModel<I, T>> implements CommonRepository<E, I, T> {
 
     @Autowired
-    private CommonMapper<E, I> mapper;
+    private CommonMapper<E, I, T> mapper;
 
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;

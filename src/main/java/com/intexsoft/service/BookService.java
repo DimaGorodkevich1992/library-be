@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -22,14 +23,23 @@ public class BookService extends CommonService<Book, UUID, Book> {
     @Autowired
     private BookRepository bookRepository;
 
-    public Observable<Book> searchBook(String name, String author) {
-        return Observable.from(bookRepository.searchBook(name, author))
+    public Observable<Book> searchBook1(String name, String author) {
+        return Observable.just(name, author)
+                .compose(observable ->  Observable.from(bookRepository.searchBook(name,author)))
                 .subscribeOn(Schedulers.io());
     }
 
-    public Observable<Library> searchLibraries(UUID bookId){
-        return Observable.from(libraryBookRepository.searchLibraries(bookId))
+    public Observable<Book> searchBook(String name, String author) {
+        return Observable.fromCallable (() -> Observable.from(bookRepository.searchBook(name,author)))
+                .compose(Observable::merge)
                 .subscribeOn(Schedulers.io());
+    }
+
+    public Observable<Library> searchLibraries(UUID bookId) {
+        return Observable.just(bookId)
+                .compose(observable -> Observable.from(libraryBookRepository.searchLibraries(bookId)))
+                .subscribeOn(Schedulers.io());
+
     }
 
 
@@ -42,9 +52,7 @@ public class BookService extends CommonService<Book, UUID, Book> {
         book.setId(id.getBookId());
         Library library = new Library();
         library.setId(id.getLibraryId());
-        libraryBook.setBook(book);
-        libraryBook.setLibrary(library);
-        libraryBook.setVersion(1);
+
         return Observable.just(libraryBookRepository.save(libraryBook))
                 .map(LibraryBook::getBook)
                 .subscribeOn(Schedulers.io());

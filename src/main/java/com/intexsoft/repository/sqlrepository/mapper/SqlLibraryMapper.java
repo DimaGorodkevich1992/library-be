@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @Slf4j
 @Component
-public class SqlLibraryMapper extends CommonMapper<Library, UUID> {
+public class SqlLibraryMapper extends CommonMapper<Library, UUID, Library> {
 
 
     @Override

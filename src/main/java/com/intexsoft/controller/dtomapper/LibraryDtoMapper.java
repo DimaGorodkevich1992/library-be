@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class LibraryDtoMapper extends AbstractDtoMapper<Library, LibraryDto,UUID> {
+public class LibraryDtoMapper extends AbstractDtoMapper<Library, LibraryDto, UUID, Library> {
 
     @Override
     protected void instructionToDto(Library entity, LibraryDto dto) {

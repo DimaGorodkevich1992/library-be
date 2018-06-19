@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "local", matchIfMissing = false)
-public class JsonBookRepository extends JsonCommonRepository<Book, UUID> implements BookRepository {
+public class JsonBookRepository extends JsonCommonRepository<Book, UUID,Book> implements BookRepository {
 
     @Autowired
     private JsonDataHolder jsonDataHolder;

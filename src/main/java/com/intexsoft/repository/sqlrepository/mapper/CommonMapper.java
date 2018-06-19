@@ -6,7 +6,7 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public abstract class CommonMapper<E extends CommonModel<I>, I> implements RowMapper<E> {
+public abstract class CommonMapper<E extends CommonModel<I, T>, I, T extends CommonModel<I, T>> implements RowMapper<E> {
 
 
     protected abstract E getModel();

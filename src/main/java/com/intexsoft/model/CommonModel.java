@@ -9,7 +9,6 @@ import javax.persistence.Version;
 
 
 @Data
-@EqualsAndHashCode
 @Accessors(chain = true)
 @MappedSuperclass
 public abstract class CommonModel<I, T extends CommonModel<I, T>> {

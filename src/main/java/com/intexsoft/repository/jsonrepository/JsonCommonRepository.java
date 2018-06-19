@@ -12,7 +12,7 @@ import java.util.Objects;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
-public abstract class JsonCommonRepository<E extends CommonModel<I>, I> implements CommonRepository<E, I> {
+public abstract class JsonCommonRepository<E extends CommonModel<I, T>, I, T extends CommonModel<I, T>> implements CommonRepository<E, I, T> {
 
 
     protected abstract List<E> getData();

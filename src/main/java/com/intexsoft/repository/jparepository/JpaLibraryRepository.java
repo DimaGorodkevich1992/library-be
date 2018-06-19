@@ -24,4 +24,9 @@ public class JpaLibraryRepository extends JpaCommonRepository<Library, UUID, Lib
         searchCriterias.put("name", name);
         return search(searchCriterias);
     }
+
+    @Override
+    public Library getById(UUID id) {
+        return null;
+    }
 }
