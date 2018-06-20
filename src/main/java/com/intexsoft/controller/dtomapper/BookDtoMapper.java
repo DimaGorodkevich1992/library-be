@@ -14,7 +14,7 @@ public class BookDtoMapper extends AbstractDtoMapper<Book, BookDto, UUID, Book> 
     @Override
     protected void instructionToDto(Book entity, BookDto dto) {
         super.instructionToDto(entity, dto);
-        dto.setInfo(entity.toString());
+        dto.setInfo(entity.getAuthor() + "-" + entity.getName());
     }
 
     @Override

@@ -2,13 +2,13 @@ package com.intexsoft.repository;
 
 import com.intexsoft.model.Book;
 import com.intexsoft.model.Library;
-import com.intexsoft.model.LibraryBook;
-import com.intexsoft.model.LibraryBookId;
+import com.intexsoft.model.BookLibrary;
+import com.intexsoft.model.BookLibraryId;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface LibraryBookRepository extends CommonRepository<LibraryBook, LibraryBookId, LibraryBook> {
+public interface LibraryBookRepository extends CommonRepository<BookLibrary, BookLibraryId, BookLibrary> {
 
     List<Book> searchBooks(UUID libraryId);
 

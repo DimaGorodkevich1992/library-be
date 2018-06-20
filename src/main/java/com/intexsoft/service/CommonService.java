@@ -22,6 +22,13 @@ public abstract class CommonService<E extends CommonModel<I, T>, I, T extends Co
                 .subscribeOn(Schedulers.io());
     }
 
+    public Observable<E> getByIdWithInformation(I id) {
+        return Observable.just(id)
+                .map(repository::getByIdWithInformation)
+                .filter(Objects::nonNull)
+                .subscribeOn(Schedulers.io());
+    }
+
 
     public Observable<E> store(E e) {
         return Observable.just(e)

@@ -2,8 +2,8 @@ package com.intexsoft.repository.jparepository;
 
 import com.intexsoft.model.Book;
 import com.intexsoft.model.Library;
-import com.intexsoft.model.LibraryBook;
-import com.intexsoft.model.LibraryBookId;
+import com.intexsoft.model.BookLibrary;
+import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.repository.LibraryBookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -19,13 +19,13 @@ import java.util.UUID;
 
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbJpa", matchIfMissing = false)
-public class JpaLibraryBookRepository extends JpaCommonRepository<LibraryBook, LibraryBookId, LibraryBook> implements LibraryBookRepository {
+public class JpaLibraryBookRepository extends JpaCommonRepository<BookLibrary, BookLibraryId, BookLibrary> implements LibraryBookRepository {
     @Autowired
     private EntityManager em;
 
     @Override
-    protected Class<LibraryBook> getModelClass() {
-        return LibraryBook.class;
+    protected Class<BookLibrary> getModelClass() {
+        return BookLibrary.class;
     }
 
     @Override
@@ -43,21 +43,20 @@ public class JpaLibraryBookRepository extends JpaCommonRepository<LibraryBook, L
     }
 
 
-    @Override
-    public LibraryBook getById(LibraryBookId id) {
-        return null;
-    }
-
     private <E, C> List<E> searchAttachment(C criteriaForSearchEntity, Class<E> attachment, String joinToName, String joinFromName) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<E> query = cb.createQuery(attachment);
-        Root<LibraryBook> relation = query.from(LibraryBook.class);
-        Join<LibraryBook, E> books = relation.join(joinToName);
+        Root<BookLibrary> relation = query.from(BookLibrary.class);
+        Join<BookLibrary, E> books = relation.join(joinToName);
         query.select(books).where(cb.equal(relation.get(joinFromName), criteriaForSearchEntity));
         return em.createQuery(query).getResultList();
     }
 
 
+    @Override
+    public BookLibrary getByIdWithInformation(BookLibraryId id) {
+        return null;
+    }
 }
 
 

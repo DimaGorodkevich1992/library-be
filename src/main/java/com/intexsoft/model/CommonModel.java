@@ -11,9 +11,20 @@ import javax.persistence.Version;
 @Accessors(chain = true)
 @MappedSuperclass
 public abstract class CommonModel<I, T extends CommonModel<I, T>> {
-
+    
     @Version
     private long version;
+
+    protected abstract T getModel();
+
+    public long getVersion() {
+        return version;
+    }
+
+    public T setVersion(long version) {
+        this.version = version;
+        return getModel();
+    }
 
     public abstract T setId(I id);
 

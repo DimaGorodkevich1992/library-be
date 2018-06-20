@@ -27,6 +27,11 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, T>, I, T ext
     }
 
     @Override
+    public E getByIdWithInformation(I id) {
+        return null;
+    }
+
+    @Override
     public E save(E e) {
         getData().add(e);
         return getById(e.getId());

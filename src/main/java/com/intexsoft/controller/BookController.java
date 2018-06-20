@@ -1,10 +1,12 @@
 package com.intexsoft.controller;
 
 import com.intexsoft.controller.dtomapper.BookDtoMapper;
+import com.intexsoft.controller.dtomapper.BookDtoMapperWithLibraries;
 import com.intexsoft.controller.dtomapper.LibraryDtoMapper;
 import com.intexsoft.dto.BookDto;
+import com.intexsoft.dto.BookDtoWithLibraries;
 import com.intexsoft.dto.LibraryDto;
-import com.intexsoft.model.LibraryBookId;
+import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.service.BookService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -14,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 import rx.Subscription;
-import rx.functions.Action1;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,8 +31,9 @@ public class BookController extends CommonController {
     @Autowired
     private BookDtoMapper bookDtoMapper;
     @Autowired
+    private BookDtoMapperWithLibraries bookDtoMapperWithLibraries;
+    @Autowired
     private LibraryDtoMapper libraryDtoMapper;
-
 
 
     @ApiOperation(value = "store book", notes = "Store new book in database", response = BookDto.class)
@@ -51,16 +53,29 @@ public class BookController extends CommonController {
 
     @ApiOperation(value = "get book by ID", notes = "Get book by Id")
     @GetMapping("/{id}")
-    public DeferredResult<BookDto> getById(
+    public DeferredResult<?> getById(
             @ApiParam(required = true, name = "id", value = "ID of the book you want to get")
-            @PathVariable("id") UUID id) {
-        DeferredResult<BookDto> result = getDeferredResult();
-        Subscription subscription = bookService.getById(id)
-                .map(bookDtoMapper::toDto)
-                .compose(convertToDeferredResult(result))
-                .subscribe();
-        result.onCompletion(subscription::unsubscribe);
-        return result;
+            @PathVariable("id") UUID id,
+            @ApiParam(name = "libraries")
+            @RequestParam(required = false, name = "libraries") Boolean initialize) {
+        if (initialize) {
+            DeferredResult<BookDtoWithLibraries> result = getDeferredResult();
+            Subscription subscription = bookService.getByIdWithInformation(id)
+                    .map(bookDtoMapperWithLibraries::toDto)
+                    .compose(convertToDeferredResult(result))
+                    .subscribe();
+            result.onCompletion(subscription::unsubscribe);
+            return result;
+        } else {
+            DeferredResult<BookDto> result = getDeferredResult();
+            Subscription subscription = bookService.getById(id)
+                    .map(bookDtoMapper::toDto)
+                    .compose(convertToDeferredResult(result))
+                    .subscribe();
+            result.onCompletion(subscription::unsubscribe);
+            return result;
+        }
+
     }
 
     @ApiOperation(value = "search Book", notes = "Search book . If the args is null return all books")
@@ -96,21 +111,18 @@ public class BookController extends CommonController {
     }
 
     @ApiOperation(value = "add Library")
-    @PostMapping("/library")
-    public DeferredResult<List<BookDto>> addLibrary(
-            @ApiParam(required = true, name = "libraryBookId", value = "Add library to book")
-            @RequestBody LibraryBookId libraryBookId) {
-        DeferredResult<List<BookDto>> result = getDeferredResult();
-        Subscription subscription = bookService.addLibrary(libraryBookId)
+    @PostMapping("/id/library")
+    public DeferredResult<BookDto> addLibrary(
+            @ApiParam(required = true, name = "bookLibraryId", value = "Add library to book")
+            @RequestBody BookLibraryId bookLibraryId) {
+        DeferredResult<BookDto> result = getDeferredResult();
+        Subscription subscription = bookService.addLibrary(bookLibraryId)
                 .map(bookDtoMapper::toDto)
-                .toList()
                 .compose(convertToDeferredResult(result))
                 .subscribe();
         result.onCompletion(subscription::unsubscribe);
         return result;
     }
-
-
 
 
     @ApiOperation(value = "update book", notes = "Update book")

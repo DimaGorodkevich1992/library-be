@@ -2,6 +2,7 @@ package com.intexsoft.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -25,10 +26,15 @@ public class Book extends CommonModel<UUID, Book> {
     @Column(name = "number_pages")
     private Integer numberPages;
     @OneToMany(mappedBy = "book")
-    private Set<LibraryBook> libraries = new HashSet<>();
+    private Set<BookLibrary> libraries = new HashSet<>();
 
     @Override
-    public UUID getId() {
+    protected Book getModel() {
+        return this;
+    }
+
+    @Override
+    public  UUID getId() {
         return id;
     }
 

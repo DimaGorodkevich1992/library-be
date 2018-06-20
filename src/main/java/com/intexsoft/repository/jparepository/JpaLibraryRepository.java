@@ -26,7 +26,7 @@ public class JpaLibraryRepository extends JpaCommonRepository<Library, UUID, Lib
     }
 
     @Override
-    public Library getById(UUID id) {
-        return null;
+    public Library getByIdWithInformation(UUID id) {
+        return getById(id, "books","book");
     }
 }

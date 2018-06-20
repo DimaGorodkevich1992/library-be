@@ -67,8 +67,8 @@ public abstract class AbstractDtoMapper<E extends CommonModel<I, T>, D extends C
 
     }
 
-    protected final <S, T> T map(S source, Class<T> targetClass) {
-        T var = null;
+    protected final <S, L> L map(S source, Class<L> targetClass) {
+        L var = null;
         try {
             var = targetClass.newInstance();
         } catch (ReflectiveOperationException e) {

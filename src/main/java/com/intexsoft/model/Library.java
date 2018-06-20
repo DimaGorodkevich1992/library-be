@@ -20,8 +20,14 @@ public class Library extends CommonModel<UUID, Library> {
     private UUID id;
     private String name;
     private String address;
+
+    @Override
+    protected Library getModel() {
+        return this;
+    }
+
     @OneToMany(mappedBy = "library")
-    private Set<LibraryBook> books = new HashSet<>();
+    private Set<BookLibrary> books = new HashSet<>();
 
     @Override
     public UUID getId() {

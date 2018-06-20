@@ -1,9 +1,9 @@
 package com.intexsoft.service;
 
 import com.intexsoft.model.Book;
+import com.intexsoft.model.BookLibrary;
+import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.model.Library;
-import com.intexsoft.model.LibraryBook;
-import com.intexsoft.model.LibraryBookId;
 import com.intexsoft.repository.BookRepository;
 import com.intexsoft.repository.LibraryBookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
-import java.util.List;
 import java.util.UUID;
 
 
@@ -23,14 +22,8 @@ public class BookService extends CommonService<Book, UUID, Book> {
     @Autowired
     private BookRepository bookRepository;
 
-    public Observable<Book> searchBook1(String name, String author) {
-        return Observable.just(name, author)
-                .compose(observable ->  Observable.from(bookRepository.searchBook(name,author)))
-                .subscribeOn(Schedulers.io());
-    }
-
     public Observable<Book> searchBook(String name, String author) {
-        return Observable.fromCallable (() -> Observable.from(bookRepository.searchBook(name,author)))
+        return Observable.fromCallable(() -> Observable.from(bookRepository.searchBook(name, author)))
                 .compose(Observable::merge)
                 .subscribeOn(Schedulers.io());
     }
@@ -42,19 +35,15 @@ public class BookService extends CommonService<Book, UUID, Book> {
 
     }
 
-
-    public Observable<Book> addLibrary(LibraryBookId id) {
-
-
-        LibraryBook libraryBook = new LibraryBook();
-        libraryBook.setId(id);
-        Book book = new Book();
-        book.setId(id.getBookId());
-        Library library = new Library();
-        library.setId(id.getLibraryId());
-
-        return Observable.just(libraryBookRepository.save(libraryBook))
-                .map(LibraryBook::getBook)
+    public Observable<Book> addLibrary(BookLibraryId id) {
+        BookLibrary bookLibrary = new BookLibrary()
+                .setId(id)
+                .setVersion(1)
+                .setBook(new Book().setId(id.getBookId()))
+                .setLibrary(new Library().setId(id.getLibraryId()));
+        return Observable.fromCallable(() -> Observable.from(new BookLibrary[]{libraryBookRepository.save(bookLibrary)}))
+                .compose(Observable::merge)
+                .map(BookLibrary::getBook)
                 .subscribeOn(Schedulers.io());
     }
 

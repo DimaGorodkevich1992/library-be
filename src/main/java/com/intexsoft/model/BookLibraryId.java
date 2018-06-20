@@ -11,7 +11,7 @@ import java.util.UUID;
 @Data
 @Accessors(chain = true)
 @Embeddable
-public class LibraryBookId implements Serializable {
+public class BookLibraryId implements Serializable {
 
     private static final long serialVersionUID = 2716468985254890805L;
 
