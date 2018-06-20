@@ -9,12 +9,14 @@ import com.intexsoft.repository.LibraryBookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.Attribute;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,16 +46,18 @@ public class JpaBookRepository extends JpaCommonRepository<Book, UUID, Book> imp
 
     }
 
-
+    @Transactional
     @Override
     public Book getById(UUID id) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<Book> query = cb.createQuery(Book.class);
         Root<Book> from = query.from(Book.class);
-        Fetch<LibraryBook,Library> fetch = from.fetch("libraries",);
-        query.select(from).where(cb.equal(from.get("id"),id));
-        Book book2 = em.createQuery(query).getSingleResult();
+        //Attribute<>
+        Fetch<LibraryBook, Book> libraries = from.fetch("libraries");
+        query.select(from).where(cb.equal(from.get("id"), id));
+
         return em.createQuery(query).getSingleResult();
     }
+
 
 }
