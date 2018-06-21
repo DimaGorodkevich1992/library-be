@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import javax.persistence.EntityManager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +17,6 @@ import java.util.UUID;
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbJpa", matchIfMissing = false)
 public class JpaBookRepository extends JpaCommonRepository<Book, UUID, Book> implements BookRepository {
-    @Autowired
-    private EntityManager em;
 
     @Autowired
     private LibraryBookRepository libraryBookRepository;
@@ -30,8 +27,8 @@ public class JpaBookRepository extends JpaCommonRepository<Book, UUID, Book> imp
     }
 
     @Override
-    public Book getByIdWithInformation(UUID id) {
-        return getById(id,"libraries","library");
+    public Book getByIdWithLibraries(UUID id) {
+        return getById(id, "libraries", "library");
     }
 
     @Override

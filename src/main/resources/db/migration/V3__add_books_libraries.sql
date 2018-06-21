@@ -5,7 +5,7 @@ ALTER TABLE "library" RENAME TO libraries;
 CREATE TABLE "books_libraries" (
 	"book_id" uuid NOT NULL ,
 	"library_id" uuid NOT NULL ,
-	"version" bigint,
+	"version" bigint NOT NULL,
 	PRIMARY KEY(book_id, library_id)
 );
 

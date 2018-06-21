@@ -1,9 +1,9 @@
 package com.intexsoft.repository.jparepository;
 
 import com.intexsoft.model.Book;
-import com.intexsoft.model.Library;
 import com.intexsoft.model.BookLibrary;
 import com.intexsoft.model.BookLibraryId;
+import com.intexsoft.model.Library;
 import com.intexsoft.repository.LibraryBookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,16 +30,12 @@ public class JpaLibraryBookRepository extends JpaCommonRepository<BookLibrary, B
 
     @Override
     public List<Book> searchBooks(UUID libraryId) {
-        Library tmpLibrary = new Library();
-        tmpLibrary.setId(libraryId);
-        return searchAttachment(tmpLibrary, Book.class, "book", "library");
+        return searchAttachment(new Library().setId(libraryId), Book.class, "book", "library");
     }
 
     @Override
     public List<Library> searchLibraries(UUID bookId) {
-        Book tmpBook = new Book();
-        tmpBook.setId(bookId);
-        return searchAttachment(tmpBook, Library.class, "library", "book");
+        return searchAttachment(new Book().setId(bookId), Library.class, "library", "book");
     }
 
 
@@ -52,11 +48,6 @@ public class JpaLibraryBookRepository extends JpaCommonRepository<BookLibrary, B
         return em.createQuery(query).getResultList();
     }
 
-
-    @Override
-    public BookLibrary getByIdWithInformation(BookLibraryId id) {
-        return null;
-    }
 }
 
 

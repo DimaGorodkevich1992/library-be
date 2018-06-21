@@ -2,7 +2,6 @@ package com.intexsoft.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -10,7 +9,6 @@ import javax.persistence.*;
 
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"book", "library"})
-@ToString(exclude = {"book", "library"})
 @Accessors(chain = true)
 @Entity
 @Table(name = "books_libraries")

@@ -19,5 +19,4 @@ public class BookLibraryId implements Serializable {
     private UUID bookId;
     @Column(name = "library_id")
     private UUID libraryId;
-
 }

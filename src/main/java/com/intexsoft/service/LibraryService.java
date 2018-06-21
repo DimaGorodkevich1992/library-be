@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -22,9 +23,17 @@ public class LibraryService extends CommonService<Library, UUID, Library> {
     @Autowired
     private LibraryRepository repositoryLibrary;
 
+
     public Observable<Library> searchLibrary(String name, String address) {
         return Observable.fromCallable(() -> Observable.from(repositoryLibrary.searchLibrary(name, address)))
                 .compose(Observable::merge)
+                .subscribeOn(Schedulers.io());
+    }
+
+    public Observable<Library> getByIdWithBooks(UUID id) {
+        return Observable.just(id)
+                .map(repositoryLibrary::getByIdWithBooks)
+                .filter(Objects::nonNull)
                 .subscribeOn(Schedulers.io());
     }
 
@@ -34,15 +43,14 @@ public class LibraryService extends CommonService<Library, UUID, Library> {
                 .subscribeOn(Schedulers.io());
     }
 
-    public Observable<Book> addBook(BookLibraryId id) {
-        BookLibrary bookLibrary = new BookLibrary()
-                .setId(id)
-                .setVersion(1)
-                .setBook(new Book().setId(id.getBookId()))
-                .setLibrary(new Library().setId(id.getLibraryId()));
-        return Observable.fromCallable(() -> Observable.from(new BookLibrary[]{libraryBookRepository.save(bookLibrary)}))
-                .compose(Observable::merge)
-                .map(BookLibrary::getBook)
+    public Observable<Library> addBook(BookLibraryId id) {
+        return Observable.just(id)
+                .map(s -> libraryBookRepository.save(new BookLibrary()
+                        .setId(s)
+                        .setVersion(1)
+                        .setBook(new Book().setId(s.getBookId()))
+                        .setLibrary(new Library().setId(s.getLibraryId()))))
+                .map(BookLibrary::getLibrary)
                 .subscribeOn(Schedulers.io());
     }
 

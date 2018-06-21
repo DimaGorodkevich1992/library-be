@@ -53,14 +53,14 @@ public class BookController extends CommonController {
 
     @ApiOperation(value = "get book by ID", notes = "Get book by Id")
     @GetMapping("/{id}")
-    public DeferredResult<?> getById(
+    public DeferredResult getById(
             @ApiParam(required = true, name = "id", value = "ID of the book you want to get")
             @PathVariable("id") UUID id,
             @ApiParam(name = "libraries")
             @RequestParam(required = false, name = "libraries") Boolean initialize) {
         if (initialize) {
             DeferredResult<BookDtoWithLibraries> result = getDeferredResult();
-            Subscription subscription = bookService.getByIdWithInformation(id)
+            Subscription subscription = bookService.getByIdWithLibrary(id)
                     .map(bookDtoMapperWithLibraries::toDto)
                     .compose(convertToDeferredResult(result))
                     .subscribe();
@@ -75,8 +75,9 @@ public class BookController extends CommonController {
             result.onCompletion(subscription::unsubscribe);
             return result;
         }
-
     }
+
+
 
     @ApiOperation(value = "search Book", notes = "Search book . If the args is null return all books")
     @GetMapping()

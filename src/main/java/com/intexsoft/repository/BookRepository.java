@@ -8,10 +8,9 @@ import java.util.UUID;
 
 public interface BookRepository extends CommonRepository<Book, UUID, Book> {
 
+    Book getByIdWithLibraries(UUID id);
 
     List<Book> searchBook(String name, String author);
-
-
 
 
 }

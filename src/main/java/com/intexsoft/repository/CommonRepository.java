@@ -8,8 +8,6 @@ import java.util.Map;
 public interface CommonRepository<E extends CommonModel<I, T>, I, T extends CommonModel<I, T>> {
     E getById(I id);
 
-    E getByIdWithInformation(I id);
-
     E save(E e);
 
     List<E> search(Map<String, Object> searchCriterias);

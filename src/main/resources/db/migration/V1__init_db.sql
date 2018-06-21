@@ -6,7 +6,7 @@ CREATE TABLE "books" (
 	"author" character varying(256) NOT NULL,
 	"published" TIMESTAMP NOT NULL,
 	"number_pages" int4 NOT NULL,
-	"version" bigint,
+	"version" bigint NOT NULL,
 	"library_id" UUID NOT NULL
 	)
 

@@ -19,14 +19,14 @@ public class JpaLibraryRepository extends JpaCommonRepository<Library, UUID, Lib
     }
 
     @Override
+    public Library getByIdWithBooks(UUID id) {
+        return getById(id, "books", "book");
+    }
+
+    @Override
     public List<Library> searchLibrary(String name, String address) {
         Map<String, Object> searchCriterias = new HashMap<>();
         searchCriterias.put("name", name);
         return search(searchCriterias);
-    }
-
-    @Override
-    public Library getByIdWithInformation(UUID id) {
-        return getById(id, "books","book");
     }
 }

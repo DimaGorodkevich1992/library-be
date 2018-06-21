@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode
-public class CommonDto<I>  {
-    private I id ;
+public class CommonDto<I> {
+    private I id;
     private long version;
 }

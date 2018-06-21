@@ -39,11 +39,7 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, T>, I, T exte
         mapSqlParameterSource.addValue("version", e.getVersion());
         return mapSqlParameterSource;
     }
-
-    @Override
-    public E getByIdWithInformation(I id) {
-        return null;
-    }
+    
 
     @Override
     public E getById(I id) {

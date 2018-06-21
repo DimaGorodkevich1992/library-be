@@ -21,6 +21,11 @@ public class JsonLibraryRepository extends JsonCommonRepository<Library, UUID, L
     private JsonDataHolder jsonDataHolder;
 
     @Override
+    public Library getByIdWithBooks(UUID id) {
+        return null;
+    }
+
+    @Override
     public List<Library> searchLibrary(String name, String address) {
         Map<String, Object> searchCriterias = new HashMap<>();
         searchCriterias.put("name", name);

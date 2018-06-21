@@ -17,6 +17,11 @@ import java.util.UUID;
 public class SqlLibraryRepository extends SqlCommonRepository<Library, UUID, Library> implements LibraryRepository {
 
     @Override
+    public Library getByIdWithBooks(UUID id) {
+        return null;
+    }
+
+    @Override
     protected String sqlGetById() {
         return "SELECT library.id AS library_id, library.name AS library_name, library.address, library.version AS library_version FROM library WHERE library.id = :id";
     }
