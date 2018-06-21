@@ -5,10 +5,7 @@ import com.intexsoft.repository.LibraryRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbJpa")
@@ -25,7 +22,10 @@ public class JpaLibraryRepository extends JpaCommonRepository<Library, UUID> imp
 
     @Override
     public Library getByIdWithBooks(UUID id) {
-        return getById(id, "books", "book");
+        List<String> fetchCriterais = new ArrayList<>();
+        fetchCriterais.add(0, "books");
+        fetchCriterais.add(1, "book");
+        return getById(id, fetchCriterais);
     }
 
     @Override

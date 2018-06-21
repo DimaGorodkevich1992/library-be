@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbJpa")
@@ -31,7 +28,10 @@ public class JpaBookRepository extends JpaCommonRepository<Book, UUID> implement
 
     @Override
     public Book getByIdWithLibraries(UUID id) {
-        return getById(id, "libraries", "library");
+        List<String> fetchCriterias = new ArrayList<>();
+        fetchCriterias.add(0, "libraries");
+        fetchCriterias.add(1, "library");
+        return getById(id, fetchCriterias);
     }
 
     @Override
