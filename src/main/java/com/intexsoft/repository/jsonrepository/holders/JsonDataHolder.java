@@ -20,7 +20,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 @Component
-@ConditionalOnProperty(name = "datasource.name", havingValue = "local", matchIfMissing = false)
+@ConditionalOnProperty(name = "datasource.name", havingValue = "local")
 public class JsonDataHolder {
 
 

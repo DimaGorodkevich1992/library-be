@@ -16,6 +16,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "books")
 public class Book extends CommonModel<UUID, Book> {
+
     @Id
     @Column(name = "id")
     private UUID id;
@@ -33,7 +34,7 @@ public class Book extends CommonModel<UUID, Book> {
     }
 
     @Override
-    public  UUID getId() {
+    public UUID getId() {
         return id;
     }
 

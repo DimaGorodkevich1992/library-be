@@ -6,13 +6,14 @@ import com.intexsoft.model.CommonModel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 
 @Slf4j
-public abstract class AbstractDtoMapper<E extends CommonModel<I, T>, D extends CommonDto<I>, I, T extends CommonModel<I, T>> {
+public abstract class AbstractDtoMapper<E extends CommonModel<I, E>, D extends CommonDto<I>, I extends Serializable> {
 
     protected abstract Class<E> getEntityClass();
 
@@ -67,8 +68,8 @@ public abstract class AbstractDtoMapper<E extends CommonModel<I, T>, D extends C
 
     }
 
-    protected final <S, L> L map(S source, Class<L> targetClass) {
-        L var = null;
+    protected final <S, T> T map(S source, Class<T> targetClass) {
+        T var = null;
         try {
             var = targetClass.newInstance();
         } catch (ReflectiveOperationException e) {

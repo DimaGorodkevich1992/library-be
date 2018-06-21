@@ -6,14 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public abstract class CommonService<E extends CommonModel<I, T>, I, T extends CommonModel<I, T>> {
+public abstract class CommonService<E extends CommonModel<I, E>, I extends Serializable> {
 
     @Autowired
-    private CommonRepository<E, I, T> repository;
-
-    protected abstract I getGeneratedId();
+    private CommonRepository<E, I> repository;
 
     public Observable<E> getById(I id) {
         return Observable.just(id)
@@ -24,10 +23,6 @@ public abstract class CommonService<E extends CommonModel<I, T>, I, T extends Co
 
     public Observable<E> store(E e) {
         return Observable.just(e)
-                .doOnNext(s -> {
-                    s.setId(getGeneratedId());
-                    s.setVersion(1);
-                })
                 .doOnNext(repository::save)
                 .subscribeOn(Schedulers.io());
     }

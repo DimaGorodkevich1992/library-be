@@ -1,6 +1,5 @@
 package com.intexsoft.repository.jparepository;
 
-
 import com.intexsoft.model.Book;
 import com.intexsoft.repository.BookRepository;
 import com.intexsoft.repository.LibraryBookRepository;
@@ -13,13 +12,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-
 @Component
-@ConditionalOnProperty(name = "datasource.name", havingValue = "dbJpa", matchIfMissing = false)
-public class JpaBookRepository extends JpaCommonRepository<Book, UUID, Book> implements BookRepository {
+@ConditionalOnProperty(name = "datasource.name", havingValue = "dbJpa")
+public class JpaBookRepository extends JpaCommonRepository<Book, UUID> implements BookRepository {
 
     @Autowired
     private LibraryBookRepository libraryBookRepository;
+
+    @Override
+    public UUID getGeneratedId(Book book) {
+        return UUID.randomUUID();
+    }
 
     @Override
     protected Class<Book> getModelClass() {

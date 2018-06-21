@@ -15,14 +15,13 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Service
-public class LibraryService extends CommonService<Library, UUID, Library> {
+public class LibraryService extends CommonService<Library, UUID> {
 
     @Autowired
     private LibraryBookRepository libraryBookRepository;
 
     @Autowired
     private LibraryRepository repositoryLibrary;
-
 
     public Observable<Library> searchLibrary(String name, String address) {
         return Observable.fromCallable(() -> Observable.from(repositoryLibrary.searchLibrary(name, address)))
@@ -43,19 +42,13 @@ public class LibraryService extends CommonService<Library, UUID, Library> {
                 .subscribeOn(Schedulers.io());
     }
 
-    public Observable<Library> addBook(BookLibraryId id) {
-        return Observable.just(id)
-                .map(s -> libraryBookRepository.save(new BookLibrary()
-                        .setId(s)
-                        .setVersion(1)
-                        .setBook(new Book().setId(s.getBookId()))
-                        .setLibrary(new Library().setId(s.getLibraryId()))))
-                .map(BookLibrary::getLibrary)
+    public Observable<Library> addBook(UUID libraryId, UUID bookId) {
+        return Observable.fromCallable(() -> libraryBookRepository.save(new BookLibrary()
+                .setId(new BookLibraryId()
+                        .setLibraryId(libraryId)
+                        .setBookId(bookId))))
+                .map(bl -> repositoryLibrary.getByIdWithBooks(bl.getId().getLibraryId()))
                 .subscribeOn(Schedulers.io());
     }
 
-    @Override
-    protected UUID getGeneratedId() {
-        return UUID.randomUUID();
-    }
 }

@@ -18,13 +18,11 @@ import static org.springframework.http.ResponseEntity.status;
 public abstract class CommonController {
 
     private static final String TIME_ERROR = "Response time exceeded";
-    
 
     private static final long TIMEOUT = 5000;
 
     @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity<String> acceptIllegalArgumentException(IllegalArgumentException ex) {
-
         log.error("Illegal argument exception: ", ex);
         return status(BAD_REQUEST).body("Illegal argument exception: " + ex.getMessage());
     }

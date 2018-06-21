@@ -6,17 +6,19 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 
-
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"book", "library"})
 @Accessors(chain = true)
 @Entity
 @Table(name = "books_libraries")
 public class BookLibrary extends CommonModel<BookLibraryId, BookLibrary> {
+
     @Override
     protected BookLibrary getModel() {
         return this;
     }
+
+    //todo version
 
     @EmbeddedId
     private BookLibraryId id;
@@ -26,6 +28,5 @@ public class BookLibrary extends CommonModel<BookLibraryId, BookLibrary> {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "library_id", insertable = false, updatable = false)
     private Library library;
-
 
 }

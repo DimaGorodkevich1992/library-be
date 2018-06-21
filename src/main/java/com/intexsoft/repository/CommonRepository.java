@@ -2,10 +2,12 @@ package com.intexsoft.repository;
 
 import com.intexsoft.model.CommonModel;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public interface CommonRepository<E extends CommonModel<I, T>, I, T extends CommonModel<I, T>> {
+public interface CommonRepository<E extends CommonModel<I, E>, I extends Serializable> {
+
     E getById(I id);
 
     E save(E e);
@@ -15,5 +17,7 @@ public interface CommonRepository<E extends CommonModel<I, T>, I, T extends Comm
     E update(E e);
 
     void deleteById(I id);
+
+    I getGeneratedId(E e);
 
 }

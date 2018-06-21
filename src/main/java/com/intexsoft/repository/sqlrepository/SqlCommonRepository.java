@@ -10,14 +10,15 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public abstract class SqlCommonRepository<E extends CommonModel<I, T>, I, T extends CommonModel<I, T>> implements CommonRepository<E, I, T> {
+public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends Serializable> implements CommonRepository<E, I> {
 
     @Autowired
-    private CommonMapper<E, I, T> mapper;
+    private CommonMapper<E, I> mapper;
 
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
@@ -39,7 +40,6 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, T>, I, T exte
         mapSqlParameterSource.addValue("version", e.getVersion());
         return mapSqlParameterSource;
     }
-    
 
     @Override
     public E getById(I id) {
@@ -80,8 +80,15 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, T>, I, T exte
     }
 
 
+
+
     @Override
     public void deleteById(I id) {
         jdbcTemplate.update(sqlDelete(), new MapSqlParameterSource("id", id));
+    }
+
+    @Override
+    public I getGeneratedId(E e) {
+        return null;
     }
 }

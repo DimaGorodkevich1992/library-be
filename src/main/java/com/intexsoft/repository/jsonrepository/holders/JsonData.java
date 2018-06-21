@@ -13,5 +13,4 @@ public class JsonData {
 
     private List<Book> bookList;
     private List<Library> libraryList;
-
 }

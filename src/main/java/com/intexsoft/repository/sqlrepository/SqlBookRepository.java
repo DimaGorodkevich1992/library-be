@@ -14,7 +14,7 @@ import java.util.UUID;
 
 
 @Component
-@ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql", matchIfMissing = false)
+@ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implements BookRepository {
 
 

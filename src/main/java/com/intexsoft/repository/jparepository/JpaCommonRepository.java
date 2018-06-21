@@ -10,13 +10,18 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+public abstract class JpaCommonRepository<E extends CommonModel<I, E>, I extends Serializable> implements CommonRepository<E, I> {
 
-public abstract class JpaCommonRepository<E extends CommonModel<I, T>, I, T extends CommonModel<I, T>> implements CommonRepository<E, I, T> {
+    @Override
+    public I getGeneratedId(E e) {
+        return e.getId();
+    }
 
     @Autowired
     private EntityManager em;
@@ -29,8 +34,6 @@ public abstract class JpaCommonRepository<E extends CommonModel<I, T>, I, T exte
 
     }
 
-
-    
     protected E getById(I id, String fetch1, String fetch2) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<E> query = cb.createQuery(getModelClass());
@@ -40,13 +43,14 @@ public abstract class JpaCommonRepository<E extends CommonModel<I, T>, I, T exte
         return em.createQuery(query).getSingleResult();
     }
 
-
     @Override
+    @Transactional
     public E save(E e) {
-        em.persist(e);
-        return e;
+        I id = getGeneratedId(e);
+        em.persist(e.setId(id)
+                .setVersion(1));
+        return getById(id);
     }
-
 
     @Override
     public E update(E e) {
@@ -54,13 +58,11 @@ public abstract class JpaCommonRepository<E extends CommonModel<I, T>, I, T exte
         return getById(e.getId());
     }
 
-
     @Override
     public void deleteById(I id) {
         em.remove(getById(id));
     }
 
-    
     @Override
     public List<E> search(Map<String, Object> searchCriterias) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -74,6 +76,4 @@ public abstract class JpaCommonRepository<E extends CommonModel<I, T>, I, T exte
         cq.select(from).where(predicates.toArray(new Predicate[]{}));
         return em.createQuery(cq).getResultList();
     }
-
-
 }

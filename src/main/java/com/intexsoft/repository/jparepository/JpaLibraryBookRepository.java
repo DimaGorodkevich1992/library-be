@@ -18,8 +18,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-@ConditionalOnProperty(name = "datasource.name", havingValue = "dbJpa", matchIfMissing = false)
-public class JpaLibraryBookRepository extends JpaCommonRepository<BookLibrary, BookLibraryId, BookLibrary> implements LibraryBookRepository {
+@ConditionalOnProperty(name = "datasource.name", havingValue = "dbJpa")
+public class JpaLibraryBookRepository extends JpaCommonRepository<BookLibrary, BookLibraryId> implements LibraryBookRepository {
+    
     @Autowired
     private EntityManager em;
 
@@ -37,7 +38,6 @@ public class JpaLibraryBookRepository extends JpaCommonRepository<BookLibrary, B
     public List<Library> searchLibraries(UUID bookId) {
         return searchAttachment(new Book().setId(bookId), Library.class, "library", "book");
     }
-
 
     private <E, C> List<E> searchAttachment(C criteriaForSearchEntity, Class<E> attachment, String joinToName, String joinFromName) {
         CriteriaBuilder cb = em.getCriteriaBuilder();

@@ -3,10 +3,11 @@ package com.intexsoft.repository.sqlrepository.mapper;
 import com.intexsoft.model.CommonModel;
 import org.springframework.jdbc.core.RowMapper;
 
+import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public abstract class CommonMapper<E extends CommonModel<I, T>, I, T extends CommonModel<I, T>> implements RowMapper<E> {
+public abstract class CommonMapper<E extends CommonModel<I, E>, I extends Serializable> implements RowMapper<E> {
 
 
     protected abstract E getModel();

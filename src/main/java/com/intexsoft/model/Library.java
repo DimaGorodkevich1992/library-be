@@ -15,6 +15,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "libraries")
 public class Library extends CommonModel<UUID, Library> {
+
     @Id
     @Column(name = "id")
     private UUID id;
@@ -39,6 +40,5 @@ public class Library extends CommonModel<UUID, Library> {
         this.id = id;
         return this;
     }
-
 
 }

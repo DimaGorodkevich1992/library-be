@@ -9,17 +9,12 @@ import java.util.UUID;
 
 
 @Component
-public class BookDtoMapper extends AbstractDtoMapper<Book, BookDto, UUID, Book> {
+public class BookDtoMapper extends AbstractDtoMapper<Book, BookDto, UUID> {
 
     @Override
     protected void instructionToDto(Book entity, BookDto dto) {
         super.instructionToDto(entity, dto);
         dto.setInfo(entity.getAuthor() + "-" + entity.getName());
-    }
-
-    @Override
-    protected void instructionToEntity(BookDto dto, Book entity) {
-        super.instructionToEntity(dto, entity);
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.intexsoft.controller.dtomapper.LibraryDtoMapper;
 import com.intexsoft.dto.BookDto;
 import com.intexsoft.dto.BookDtoWithLibraries;
 import com.intexsoft.dto.LibraryDto;
-import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.service.BookService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,7 +18,6 @@ import rx.Subscription;
 
 import java.util.List;
 import java.util.UUID;
-
 
 @Api("/api/v1/client/book")
 @RestController()
@@ -34,7 +32,6 @@ public class BookController extends CommonController {
     private BookDtoMapperWithLibraries bookDtoMapperWithLibraries;
     @Autowired
     private LibraryDtoMapper libraryDtoMapper;
-
 
     @ApiOperation(value = "store book", notes = "Store new book in database", response = BookDto.class)
     @PostMapping()
@@ -52,13 +49,13 @@ public class BookController extends CommonController {
     }
 
     @ApiOperation(value = "get book by ID", notes = "Get book by Id")
-    @GetMapping("/{id}")
+    @GetMapping("/{id}")                                                                     //todo
     public DeferredResult getById(
             @ApiParam(required = true, name = "id", value = "ID of the book you want to get")
             @PathVariable("id") UUID id,
             @ApiParam(name = "libraries")
-            @RequestParam(required = false, name = "libraries") Boolean initialize) {
-        if (initialize) {
+            @RequestParam(required = false, name = "libraries") Boolean libraries) {
+        if (libraries) {
             DeferredResult<BookDtoWithLibraries> result = getDeferredResult();
             Subscription subscription = bookService.getByIdWithLibrary(id)
                     .map(bookDtoMapperWithLibraries::toDto)
@@ -77,8 +74,6 @@ public class BookController extends CommonController {
         }
     }
 
-
-
     @ApiOperation(value = "search Book", notes = "Search book . If the args is null return all books")
     @GetMapping()
     public DeferredResult<List<BookDto>> searchBook(
@@ -93,7 +88,6 @@ public class BookController extends CommonController {
                 .compose(convertToDeferredResult(result))
                 .subscribe();
         result.onCompletion(subscription::unsubscribe);
-
         return result;
     }
 
@@ -112,19 +106,20 @@ public class BookController extends CommonController {
     }
 
     @ApiOperation(value = "add Library")
-    @PostMapping("/id/library")
-    public DeferredResult<BookDto> addLibrary(
-            @ApiParam(required = true, name = "bookLibraryId", value = "Add library to book")
-            @RequestBody BookLibraryId bookLibraryId) {
-        DeferredResult<BookDto> result = getDeferredResult();
-        Subscription subscription = bookService.addLibrary(bookLibraryId)
-                .map(bookDtoMapper::toDto)
+    @PostMapping("/{id}/library/{libraryid}")
+    public DeferredResult<BookDtoWithLibraries> addLibrary(
+            @ApiParam(required = true, name = "id", value = "ID book to add library")
+            @PathVariable ("id") UUID id,
+            @ApiParam(required = true, name = "libraryId", value = "ID library to add in book")
+            @PathVariable ("libraryid") UUID libraryId ) {
+        DeferredResult<BookDtoWithLibraries> result = getDeferredResult();
+        Subscription subscription = bookService.addLibrary(id,libraryId)
+                .map(bookDtoMapperWithLibraries::toDto)
                 .compose(convertToDeferredResult(result))
                 .subscribe();
         result.onCompletion(subscription::unsubscribe);
         return result;
     }
-
 
     @ApiOperation(value = "update book", notes = "Update book")
     @PutMapping()
@@ -140,7 +135,6 @@ public class BookController extends CommonController {
         return result;
     }
 
-
     @ApiOperation(value = "delete book by ID", notes = "Delete book by Id")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -154,6 +148,5 @@ public class BookController extends CommonController {
         result.onCompletion(subscription::unsubscribe);
         return result;
     }
-
 
 }

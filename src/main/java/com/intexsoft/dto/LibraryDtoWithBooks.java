@@ -8,5 +8,6 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class LibraryDtoWithBooks extends LibraryDto {
-    private Set<BookDtoInfo> books;
+
+    private Set<BookDto> books;
 }

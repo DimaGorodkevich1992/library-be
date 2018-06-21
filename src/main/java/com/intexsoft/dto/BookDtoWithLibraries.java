@@ -9,5 +9,5 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class BookDtoWithLibraries extends BookDto {
 
-    private Set<LibraryDtoInfo> libraries;
+    private Set<LibraryDto> libraries;
 }

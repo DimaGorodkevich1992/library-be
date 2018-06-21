@@ -14,9 +14,9 @@ import rx.schedulers.Schedulers;
 import java.util.Objects;
 import java.util.UUID;
 
-
 @Service
-public class BookService extends CommonService<Book, UUID, Book> {
+public class BookService extends CommonService<Book, UUID> {
+
     @Autowired
     private LibraryBookRepository libraryBookRepository;
 
@@ -43,19 +43,13 @@ public class BookService extends CommonService<Book, UUID, Book> {
 
     }
 
-    public Observable<Book> addLibrary(BookLibraryId id) {
-        return Observable.just(id)
-                .map(s -> libraryBookRepository.save(new BookLibrary()
-                        .setId(s)
-                        .setVersion(1)
-                        .setBook(new Book().setId(s.getBookId()))
-                        .setLibrary(new Library().setId(s.getLibraryId()))))
-                .map(BookLibrary::getBook)
+    public Observable<Book> addLibrary(UUID bookId, UUID libraryId) {
+        return Observable.fromCallable(() -> libraryBookRepository.save(new BookLibrary()
+                .setId(new BookLibraryId()
+                        .setBookId(bookId)
+                        .setLibraryId(libraryId))))
+                .map(bl -> bookRepository.getByIdWithLibraries(bl.getId().getBookId()))
                 .subscribeOn(Schedulers.io());
     }
 
-    @Override
-    protected UUID getGeneratedId() {
-        return UUID.randomUUID();
-    }
 }

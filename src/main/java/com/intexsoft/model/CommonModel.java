@@ -5,13 +5,13 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
-
+import java.io.Serializable;
 
 @Data
 @Accessors(chain = true)
 @MappedSuperclass
-public abstract class CommonModel<I, T extends CommonModel<I, T>> {
-    
+public abstract class CommonModel<I extends Serializable, T extends CommonModel<I, T>> {
+
     @Version
     private long version;
 

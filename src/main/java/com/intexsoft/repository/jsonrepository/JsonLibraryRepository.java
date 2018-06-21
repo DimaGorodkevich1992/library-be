@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.UUID;
 
 @Component
-@ConditionalOnProperty(name = "datasource.name", havingValue = "local", matchIfMissing = false)
-public class JsonLibraryRepository extends JsonCommonRepository<Library, UUID, Library> implements LibraryRepository {
+@ConditionalOnProperty(name = "datasource.name", havingValue = "local")
+public class JsonLibraryRepository extends JsonCommonRepository<Library, UUID> implements LibraryRepository {
 
 
     @Autowired

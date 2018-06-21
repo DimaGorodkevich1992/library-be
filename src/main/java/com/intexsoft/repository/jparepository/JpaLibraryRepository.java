@@ -11,8 +11,13 @@ import java.util.Map;
 import java.util.UUID;
 
 @Component
-@ConditionalOnProperty(name = "datasource.name", havingValue = "dbJpa", matchIfMissing = false)
-public class JpaLibraryRepository extends JpaCommonRepository<Library, UUID, Library> implements LibraryRepository {
+@ConditionalOnProperty(name = "datasource.name", havingValue = "dbJpa")
+public class JpaLibraryRepository extends JpaCommonRepository<Library, UUID> implements LibraryRepository {
+
+    @Override
+    public UUID getGeneratedId(Library library) {
+        return UUID.randomUUID();
+    }
 
     protected Class<Library> getModelClass() {
         return Library.class;

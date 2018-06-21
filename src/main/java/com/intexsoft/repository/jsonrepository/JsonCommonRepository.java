@@ -5,6 +5,7 @@ import com.intexsoft.repository.CommonRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -12,8 +13,12 @@ import java.util.Objects;
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
-public abstract class JsonCommonRepository<E extends CommonModel<I, T>, I, T extends CommonModel<I, T>> implements CommonRepository<E, I, T> {
+public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extends Serializable> implements CommonRepository<E, I> {
 
+    @Override
+    public I getGeneratedId(E e) {
+        return null;
+    }
 
     protected abstract List<E> getData();
 

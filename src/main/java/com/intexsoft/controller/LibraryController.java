@@ -6,7 +6,6 @@ import com.intexsoft.controller.dtomapper.LibraryDtoMapperWithBooks;
 import com.intexsoft.dto.BookDto;
 import com.intexsoft.dto.LibraryDto;
 import com.intexsoft.dto.LibraryDtoWithBooks;
-import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.service.LibraryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,7 +18,6 @@ import rx.Subscription;
 
 import java.util.List;
 import java.util.UUID;
-
 
 @Api("/api/v1/client/library")
 @RestController()
@@ -51,13 +49,13 @@ public class LibraryController extends CommonController {
     }
 
     @ApiOperation(value = "get library by ID", notes = "Get library by Id")
-    @GetMapping("/{id}")
+    @GetMapping("/{id}")                                                                       //todo
     public DeferredResult getById(
             @ApiParam(required = true, name = "id", value = "ID of the library you want to get")
             @PathVariable("id") UUID id,
             @ApiParam(name = "books")
-            @RequestParam(required = false, name = "books") Boolean initialize) {
-        if (initialize) {
+            @RequestParam(required = false, name = "books") Boolean books) {
+        if (books) {
             DeferredResult<LibraryDtoWithBooks> result = getDeferredResult();
             Subscription subscription = libraryService.getByIdWithBooks(id)
                     .map(libraryDtoMapperWithBooks::toDto)
@@ -76,7 +74,6 @@ public class LibraryController extends CommonController {
         }
     }
 
-
     @GetMapping("/{id}/books")
     public DeferredResult<List<BookDto>> getBooksForLibrary(
             @ApiParam(required = true, name = "id", value = "ID from the library to find books")
@@ -92,19 +89,20 @@ public class LibraryController extends CommonController {
     }
 
     @ApiOperation(value = "add Book")
-    @PostMapping("/id/book")
-    public DeferredResult<LibraryDto> addBook(
-            @ApiParam(required = true, name = "bookLibraryId", value = "Add book to library")
-            @RequestBody BookLibraryId bookLibraryId) {
-        DeferredResult<LibraryDto> result = getDeferredResult();
-        Subscription subscription = libraryService.addBook(bookLibraryId)
-                .map(libraryDtoMapper::toDto)
+    @PostMapping("/{id}/book/{bookid}")
+    public DeferredResult<LibraryDtoWithBooks> addBook(
+            @ApiParam(required = true, name = "id", value = "ID library to add book")
+            @PathVariable("id") UUID id,
+            @ApiParam(required = true, name = "bookid", value = "ID book to add in library")
+            @PathVariable("bookid") UUID bookId) {
+        DeferredResult<LibraryDtoWithBooks> result = getDeferredResult();
+        Subscription subscription = libraryService.addBook(id,bookId)
+                .map(libraryDtoMapperWithBooks::toDto)
                 .compose(convertToDeferredResult(result))
                 .subscribe();
         result.onCompletion(subscription::unsubscribe);
         return result;
     }
-
 
     @ApiOperation(value = "search Library", notes = "Search library. If the args is null return all library")
     @GetMapping()
@@ -120,7 +118,6 @@ public class LibraryController extends CommonController {
                 .compose(convertToDeferredResult(result))
                 .subscribe();
         result.onCompletion(subscription::unsubscribe);
-
         return result;
     }
 
@@ -151,6 +148,5 @@ public class LibraryController extends CommonController {
         result.onCompletion(subscription::unsubscribe);
         return result;
     }
-
 
 }
