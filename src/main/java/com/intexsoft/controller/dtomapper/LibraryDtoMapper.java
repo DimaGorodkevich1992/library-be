@@ -10,11 +10,6 @@ import java.util.UUID;
 public class LibraryDtoMapper extends AbstractDtoMapper<Library, LibraryDto, UUID> {
 
     @Override
-    protected void instructionToDto(Library entity, LibraryDto dto) {
-        super.instructionToDto(entity, dto);
-    }
-
-    @Override
     protected Class<Library> getEntityClass() {
         return Library.class;
     }

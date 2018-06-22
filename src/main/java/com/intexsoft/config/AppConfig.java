@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableScheduling
 public class AppConfig {
+
     @Bean
     public FilterRegistrationBean<AuthFilter> authFilter() {
         FilterRegistrationBean<AuthFilter> filter = new FilterRegistrationBean<>();
@@ -17,6 +18,7 @@ public class AppConfig {
         filter.addUrlPatterns("/api/*");
         return filter;
     }
+
     @Bean
     public FilterRegistrationBean<BookFilter> bookFilter() {
         FilterRegistrationBean<BookFilter> filter = new FilterRegistrationBean<>();
@@ -25,6 +27,5 @@ public class AppConfig {
         filter.addServletNames("BookServlet");
         return filter;
     }
-
 
 }

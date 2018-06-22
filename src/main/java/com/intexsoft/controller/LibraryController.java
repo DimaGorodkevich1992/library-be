@@ -49,29 +49,22 @@ public class LibraryController extends CommonController {
     }
 
     @ApiOperation(value = "get library by ID", notes = "Get library by Id")
-    @GetMapping("/{id}")                                                                       //todo
+    @GetMapping("/{id}")
     public DeferredResult getById(
             @ApiParam(required = true, name = "id", value = "ID of the library you want to get")
             @PathVariable("id") UUID id,
             @ApiParam(name = "books")
             @RequestParam(required = false, name = "books") Boolean books) {
-        if (books) {
-            DeferredResult<LibraryDtoWithBooks> result = getDeferredResult();
-            Subscription subscription = libraryService.getByIdWithBooks(id)
-                    .map(libraryDtoMapperWithBooks::toDto)
-                    .compose(convertToDeferredResult(result))
-                    .subscribe();
-            result.onCompletion(subscription::unsubscribe);
-            return result;
-        } else {
-            DeferredResult<LibraryDto> result = getDeferredResult();
-            Subscription subscription = libraryService.getById(id)
-                    .map(libraryDtoMapper::toDto)
-                    .compose(convertToDeferredResult(result))
-                    .subscribe();
-            result.onCompletion(subscription::unsubscribe);
-            return result;
-        }
+        DeferredResult<Object> result = getDeferredResult();
+        Subscription subscription = (books ?
+                libraryService.getByIdWithBooks(id)
+                        .map(libraryDtoMapperWithBooks::toDto) :
+                libraryService.getById(id)
+                        .map(libraryDtoMapper::toDto))
+                .compose(convertToDeferredResult(result))
+                .subscribe();
+        result.onCompletion(subscription::unsubscribe);
+        return result;
     }
 
     @GetMapping("/{id}/books")
@@ -96,7 +89,7 @@ public class LibraryController extends CommonController {
             @ApiParam(required = true, name = "bookid", value = "ID book to add in library")
             @PathVariable("bookid") UUID bookId) {
         DeferredResult<LibraryDtoWithBooks> result = getDeferredResult();
-        Subscription subscription = libraryService.addBook(id,bookId)
+        Subscription subscription = libraryService.addBook(id, bookId)
                 .map(libraryDtoMapperWithBooks::toDto)
                 .compose(convertToDeferredResult(result))
                 .subscribe();

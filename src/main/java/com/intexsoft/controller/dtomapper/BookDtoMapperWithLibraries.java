@@ -27,7 +27,6 @@ public class BookDtoMapperWithLibraries extends AbstractDtoMapper<Book, BookDtoW
 
     @Override
     protected Class<Book> getEntityClass() {
-
         return Book.class;
     }
 

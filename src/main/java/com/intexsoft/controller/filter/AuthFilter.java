@@ -10,18 +10,17 @@ import java.io.IOException;
 
 @Component
 public class AuthFilter implements Filter {
+
     @Value("${application.api.key}")
     private String apiKey = "1234";
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-
+    public void init(FilterConfig filterConfig) {
     }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-
         if (apiKey.equals(request.getHeader("apikey"))) {
             filterChain.doFilter(servletRequest, servletResponse);
         } else {
@@ -34,6 +33,5 @@ public class AuthFilter implements Filter {
 
     @Override
     public void destroy() {
-
     }
 }

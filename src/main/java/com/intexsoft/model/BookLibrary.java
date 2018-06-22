@@ -18,8 +18,6 @@ public class BookLibrary extends CommonModel<BookLibraryId, BookLibrary> {
         return this;
     }
 
-    //todo version
-
     @EmbeddedId
     private BookLibraryId id;
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,12 +1,10 @@
 package com.intexsoft.controller.dtomapper;
 
-
 import com.intexsoft.dto.BookDto;
 import com.intexsoft.model.Book;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
-
 
 @Component
 public class BookDtoMapper extends AbstractDtoMapper<Book, BookDto, UUID> {
@@ -26,6 +24,5 @@ public class BookDtoMapper extends AbstractDtoMapper<Book, BookDto, UUID> {
     protected Class<BookDto> getDtoClass() {
         return BookDto.class;
     }
-
 
 }

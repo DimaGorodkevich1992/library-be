@@ -27,11 +27,13 @@ public class JpaBookRepository extends JpaCommonRepository<Book, UUID> implement
     }
 
     @Override
-    public Book getByIdWithLibraries(UUID id) {
-        List<String> fetchCriterias = new ArrayList<>();
+    public Book getByIdWithLibraries(UUID id) {                //todo
+       /* List<String> fetchCriterias = new ArrayList<>();
         fetchCriterias.add(0, "libraries");
-        fetchCriterias.add(1, "library");
-        return getById(id, fetchCriterias);
+        fetchCriterias.add(1, "library");*/
+        LinkedHashMap<String, String> featchCriterias = new LinkedHashMap<>();
+        featchCriterias.put("libraries", "library");
+        return getById(id, featchCriterias);
     }
 
     @Override

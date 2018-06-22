@@ -21,7 +21,6 @@ import java.util.UUID;
 @WebServlet(value = "/api/v2/client/book/*")
 public class BookServlet extends HttpServlet {
 
-
     private static final long serialVersionUID = 1L;
 
     @Autowired
@@ -38,26 +37,22 @@ public class BookServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         try (PrintWriter out = response.getWriter()) {
-
             String[] splitsRequest = request.getPathInfo().split("/");
-
             if (splitsRequest.length != 2) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "no id specified");
                 return;
             }
-
             UUID id = UUID.fromString(splitsRequest[splitsRequest.length - 1]);
             Book tmpBook = bookService.getById(id)
                     .toBlocking()
                     .first();
-
             out.write(objectMapper.writeValueAsString(bookDtoMapper.toDto(tmpBook)));
 
         } catch (EmptyResultDataAccessException ex) {
             log.error("Unable to get result, wrong ID", ex);
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "Unable to get result, wrong ID");
         } catch (NoSuchElementException ex) {
-            log.error("File not found",ex);
+            log.error("File not found", ex);
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }

@@ -1,6 +1,5 @@
 package com.intexsoft.controller.dtomapper;
 
-
 import com.intexsoft.dto.CommonDto;
 import com.intexsoft.model.CommonModel;
 import lombok.extern.slf4j.Slf4j;
@@ -11,14 +10,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 @Slf4j
 public abstract class AbstractDtoMapper<E extends CommonModel<I, E>, D extends CommonDto<I>, I extends Serializable> {
 
     protected abstract Class<E> getEntityClass();
 
     protected abstract Class<D> getDtoClass();
-
 
     public final D toDto(E entity) {
         D dto = map(entity, getDtoClass());
@@ -61,11 +58,9 @@ public abstract class AbstractDtoMapper<E extends CommonModel<I, E>, D extends C
     }
 
     protected void instructionToDto(E entity, D dto) {
-
     }
 
     protected void instructionToEntity(D dto, E entity) {
-
     }
 
     protected final <S, T> T map(S source, Class<T> targetClass) {

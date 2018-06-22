@@ -1,7 +1,6 @@
 
 package com.intexsoft.config;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
@@ -16,6 +15,7 @@ import java.util.Collections;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
+
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
@@ -25,9 +25,9 @@ public class SwaggerConfig {
                 .build()
                 .securitySchemes(Collections.singletonList(apiKey()));
     }
+
     private ApiKey apiKey() {
         return new ApiKey("Auth", "apikey", "header");
     }
-
 
 }

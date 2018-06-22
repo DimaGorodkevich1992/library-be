@@ -1,21 +1,17 @@
 package com.intexsoft.repository.jparepository;
 
-import com.intexsoft.model.BookLibrary;
 import com.intexsoft.model.CommonModel;
-import com.intexsoft.model.Library;
 import com.intexsoft.repository.CommonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.*;
-import javax.persistence.metamodel.ListAttribute;
-import javax.persistence.metamodel.SingularAttribute;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public abstract class JpaCommonRepository<E extends CommonModel<I, E>, I extends Serializable> implements CommonRepository<E, I> {
 
@@ -35,20 +31,30 @@ public abstract class JpaCommonRepository<E extends CommonModel<I, E>, I extends
 
     }
 
-/*
-    protected E getById(I id, List<String> fetchCriterias) {
+    protected E getById(I id, LinkedHashMap<String, String> fetchCriterias) {         //todo
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<E> query = cb.createQuery(getModelClass());
         Root<E> from = query.from(getModelClass());
-        ListAttribute>
-        from.get(ListAttribute<fetchCriterias,string>
-
-        Fetch<BookLibrary,Library> library = from.fetch("libraries").fetch("library");
-        //from.fetch("libraries").fetch("library");
-        query.where(cb.equal(from.get("id"), id));
+        for (Map.Entry<String, String> entry : fetchCriterias.entrySet()) {
+            from.fetch(entry.getKey());
+            from.getFetches()
+                    .iterator()
+                    .next()
+                    .fetch(entry.getValue());
+        }
+    /*    for (int i = 0; i < fetchCriterias.size(); i++) {
+            if (i % 2 == 0) {
+                from.fetch(fetchCriterias.get(i));
+            } else {
+                from.getFetches()
+                        .iterator()
+                        .next()
+                        .fetch(fetchCriterias.get(i));
+            }
+        }*/
+        em.createQuery(query).getSingleResult();
         return em.createQuery(query).getSingleResult();
     }
-*/
 
     @Override
     @Transactional

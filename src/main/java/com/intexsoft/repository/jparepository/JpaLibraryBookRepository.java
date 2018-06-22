@@ -20,7 +20,7 @@ import java.util.UUID;
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbJpa")
 public class JpaLibraryBookRepository extends JpaCommonRepository<BookLibrary, BookLibraryId> implements LibraryBookRepository {
-    
+
     @Autowired
     private EntityManager em;
 
