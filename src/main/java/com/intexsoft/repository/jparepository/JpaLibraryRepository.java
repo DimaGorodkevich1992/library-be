@@ -25,8 +25,11 @@ public class JpaLibraryRepository extends JpaCommonRepository<Library, UUID> imp
       /*  List<String> fetchCriterais = new ArrayList<>();
         fetchCriterais.add(0, "books");
         fetchCriterais.add(1, "book");*/
-        LinkedHashMap<String, String> featchCriterias = new LinkedHashMap<>();
-        featchCriterias.put("books", "book");
+        List<String> criterias = new ArrayList<>();
+        criterias.add("book");
+        LinkedHashMap<String,List<String> > featchCriterias = new LinkedHashMap<>();
+        featchCriterias.put("books", criterias);
+
         return getById(id, featchCriterias);
     }
 

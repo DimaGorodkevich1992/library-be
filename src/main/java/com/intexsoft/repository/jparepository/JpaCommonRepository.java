@@ -31,19 +31,20 @@ public abstract class JpaCommonRepository<E extends CommonModel<I, E>, I extends
 
     }
 
-    protected E getById(I id, LinkedHashMap<String, String> fetchCriterias) {         //todo
+    protected E getById(I id, LinkedHashMap<String, List<String>> fetchCriterias) {         //todo
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<E> query = cb.createQuery(getModelClass());
         Root<E> from = query.from(getModelClass());
-        for (Map.Entry<String, String> entry : fetchCriterias.entrySet()) {
+        for (Map.Entry<String, List<String>> entry : fetchCriterias.entrySet()) {
             from.fetch(entry.getKey());
-            from.getFetches()
+            entry.getValue().forEach(s -> from.getFetches()
                     .iterator()
                     .next()
-                    .fetch(entry.getValue());
+                    .fetch(s));
+
         }
-    /*    for (int i = 0; i < fetchCriterias.size(); i++) {
-            if (i % 2 == 0) {
+        for (int i = 0; i < fetchCriterias.size(); i++) {
+            if (i == 0) {
                 from.fetch(fetchCriterias.get(i));
             } else {
                 from.getFetches()
@@ -51,7 +52,7 @@ public abstract class JpaCommonRepository<E extends CommonModel<I, E>, I extends
                         .next()
                         .fetch(fetchCriterias.get(i));
             }
-        }*/
+        }
         em.createQuery(query).getSingleResult();
         return em.createQuery(query).getSingleResult();
     }
