@@ -4,7 +4,7 @@ import com.intexsoft.model.Book;
 import com.intexsoft.model.BookLibrary;
 import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.model.Library;
-import com.intexsoft.repository.LibraryBookRepository;
+import com.intexsoft.repository.BookLibraryRepository;
 import com.intexsoft.repository.LibraryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import java.util.UUID;
 public class LibraryService extends CommonService<Library, UUID> {
 
     @Autowired
-    private LibraryBookRepository libraryBookRepository;
+    private BookLibraryRepository bookLibraryRepository;
 
     @Autowired
     private LibraryRepository repositoryLibrary;
@@ -38,12 +38,12 @@ public class LibraryService extends CommonService<Library, UUID> {
 
     public Observable<Book> searchBooks(UUID libraryId) {
         return Observable.just(libraryId)
-                .compose(observable -> Observable.from(libraryBookRepository.searchBooks(libraryId)))
+                .compose(observable -> Observable.from(bookLibraryRepository.searchBooks(libraryId)))
                 .subscribeOn(Schedulers.io());
     }
 
     public Observable<Library> addBook(UUID libraryId, UUID bookId) {
-        return Observable.fromCallable(() -> libraryBookRepository.save(new BookLibrary()
+        return Observable.fromCallable(() -> bookLibraryRepository.save(new BookLibrary()
                 .setId(new BookLibraryId()
                         .setLibraryId(libraryId)
                         .setBookId(bookId))))

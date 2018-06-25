@@ -38,8 +38,8 @@ public class JsonDataHolder {
         List<Library> libraries = new CopyOnWriteArrayList<>();
 
         return new JsonData()
-                .setBookList(books)
-                .setLibraryList(libraries);
+                .setBooks(books)
+                .setLibraries(libraries);
     }
 
     private boolean initialized = false;

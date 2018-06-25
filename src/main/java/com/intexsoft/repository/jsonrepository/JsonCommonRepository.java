@@ -2,10 +2,13 @@ package com.intexsoft.repository.jsonrepository;
 
 import com.intexsoft.model.CommonModel;
 import com.intexsoft.repository.CommonRepository;
+import com.intexsoft.repository.jsonrepository.holders.JsonDataHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -15,10 +18,15 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extends Serializable> implements CommonRepository<E, I> {
 
+    @Autowired
+    private JsonDataHolder jsonDataHolder;
+
     @Override
     public I getGeneratedId(E e) {
-        return null;
+        return e.getId();
     }
+
+    protected abstract void getEntity(E e);
 
     protected abstract List<E> getData();
 
@@ -32,11 +40,11 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extend
     }
 
 
-
-
     @Override
     public E save(E e) {
-        getData().add(e);
+        getData().add(e
+                .setId(getGeneratedId(e))
+                .setVersion(1));
         return getById(e.getId());
     }
 
@@ -64,7 +72,6 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extend
 
     @Override
     public List<E> search(Map<String, Object> searchCriterias) {
-
         return getData()
                 .stream()
                 .filter(entry -> searchCriterias
@@ -82,7 +89,6 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extend
             return false;
         }
     }
-
 
     @Override
     public void deleteById(I id) {

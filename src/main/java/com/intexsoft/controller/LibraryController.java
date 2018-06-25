@@ -50,12 +50,12 @@ public class LibraryController extends CommonController {
 
     @ApiOperation(value = "get library by ID", notes = "Get library by Id")
     @GetMapping("/{id}")
-    public DeferredResult getById(
+    public DeferredResult<LibraryDto> getById(
             @ApiParam(required = true, name = "id", value = "ID of the library you want to get")
             @PathVariable("id") UUID id,
             @ApiParam(name = "books")
             @RequestParam(required = false, name = "books") Boolean books) {
-        DeferredResult<Object> result = getDeferredResult();
+        DeferredResult<LibraryDto> result = getDeferredResult();
         Subscription subscription = (books ?
                 libraryService.getByIdWithBooks(id)
                         .map(libraryDtoMapperWithBooks::toDto) :

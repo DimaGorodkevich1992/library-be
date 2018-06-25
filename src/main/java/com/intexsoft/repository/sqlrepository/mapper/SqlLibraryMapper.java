@@ -1,14 +1,11 @@
 package com.intexsoft.repository.sqlrepository.mapper;
 
 import com.intexsoft.model.Library;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
-
-@Slf4j
 @Component
 public class SqlLibraryMapper extends CommonMapper<Library, UUID> {
 

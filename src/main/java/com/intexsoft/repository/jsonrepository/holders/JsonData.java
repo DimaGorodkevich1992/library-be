@@ -1,6 +1,7 @@
 package com.intexsoft.repository.jsonrepository.holders;
 
 import com.intexsoft.model.Book;
+import com.intexsoft.model.BookLibrary;
 import com.intexsoft.model.Library;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -11,6 +12,7 @@ import java.util.List;
 @Accessors(chain = true)
 public class JsonData {
 
-    private List<Book> bookList;
-    private List<Library> libraryList;
+    private List<Book> books;
+    private List<Library> libraries;
+    private List<BookLibrary> bookLibraries;
 }

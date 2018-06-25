@@ -6,12 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public abstract class JpaCommonRepository<E extends CommonModel<I, E>, I extends Serializable> implements CommonRepository<E, I> {
 
@@ -31,28 +31,21 @@ public abstract class JpaCommonRepository<E extends CommonModel<I, E>, I extends
 
     }
 
-    protected E getById(I id, LinkedHashMap<String, List<String>> fetchCriterias) {         //todo
+    protected E getById(I id, List<String> fetchCriterias) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<E> query = cb.createQuery(getModelClass());
         Root<E> from = query.from(getModelClass());
-        for (Map.Entry<String, List<String>> entry : fetchCriterias.entrySet()) {
-            from.fetch(entry.getKey());
-            entry.getValue().forEach(s -> from.getFetches()
-                    .iterator()
-                    .next()
-                    .fetch(s));
-
-        }
-        for (int i = 0; i < fetchCriterias.size(); i++) {
-            if (i == 0) {
-                from.fetch(fetchCriterias.get(i));
-            } else {
-                from.getFetches()
-                        .iterator()
-                        .next()
-                        .fetch(fetchCriterias.get(i));
+        Fetch<?, ?> fetchPath = null;
+        for (String path : fetchCriterias) {
+            for (String criteria : path.split(",")) {
+                if (fetchPath == null) {
+                    fetchPath = from.fetch(criteria);
+                } else {
+                    fetchPath = fetchPath.fetch(criteria);
+                }
             }
         }
+        query.where(cb.equal(from.get("id"),id));
         em.createQuery(query).getSingleResult();
         return em.createQuery(query).getSingleResult();
     }

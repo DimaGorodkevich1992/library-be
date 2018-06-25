@@ -1,4 +1,3 @@
-/*
 package com.intexsoft.repository.sqlrepository;
 
 import com.intexsoft.model.Book;
@@ -17,6 +16,15 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implements BookRepository {
 
+    @Override
+    public Book getByIdWithLibraries(UUID id) {
+        return null;
+    }
+
+    @Override
+    public List<Book> searchBook(String name, String author) {
+        return null;
+    }
 
     private static final String SQL_SELECT_WITH_MAPPING =
             "SELECT " +
@@ -60,6 +68,7 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
     }
 
 
+/*
     @Override
     protected MapSqlParameterSource getCommonParametersSource(Book book) {
         return super.getCommonParametersSource(book)
@@ -77,7 +86,7 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
         searchCriterias.put("author", author);
         return search(searchCriterias);
     }
+*/
 
 
 }
-*/

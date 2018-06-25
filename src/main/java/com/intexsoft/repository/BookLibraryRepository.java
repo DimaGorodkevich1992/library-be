@@ -8,7 +8,7 @@ import com.intexsoft.model.Library;
 import java.util.List;
 import java.util.UUID;
 
-public interface LibraryBookRepository extends CommonRepository<BookLibrary, BookLibraryId> {
+public interface BookLibraryRepository extends CommonRepository<BookLibrary, BookLibraryId> {
 
     List<Book> searchBooks(UUID libraryId);
 

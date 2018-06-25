@@ -16,6 +16,10 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "datasource.name", havingValue = "local")
 public class JsonLibraryRepository extends JsonCommonRepository<Library, UUID> implements LibraryRepository {
 
+    @Override
+    public UUID getGeneratedId(Library library) {
+        return UUID.randomUUID();
+    }
 
     @Autowired
     private JsonDataHolder jsonDataHolder;
@@ -34,7 +38,11 @@ public class JsonLibraryRepository extends JsonCommonRepository<Library, UUID> i
     }
 
     @Override
+    protected void getEntity(Library library) {
+    }
+
+    @Override
     protected List<Library> getData() {
-        return jsonDataHolder.getJsonData().getLibraryList();
+        return jsonDataHolder.getJsonData().getLibraries();
     }
 }

@@ -21,16 +21,8 @@ public class JpaLibraryRepository extends JpaCommonRepository<Library, UUID> imp
     }
 
     @Override
-    public Library getByIdWithBooks(UUID id) {                     //todo
-      /*  List<String> fetchCriterais = new ArrayList<>();
-        fetchCriterais.add(0, "books");
-        fetchCriterais.add(1, "book");*/
-        List<String> criterias = new ArrayList<>();
-        criterias.add("book");
-        LinkedHashMap<String,List<String> > featchCriterias = new LinkedHashMap<>();
-        featchCriterias.put("books", criterias);
-
-        return getById(id, featchCriterias);
+    public Library getByIdWithBooks(UUID id) {
+        return getById(id, Arrays.asList("books,book"));
     }
 
     @Override

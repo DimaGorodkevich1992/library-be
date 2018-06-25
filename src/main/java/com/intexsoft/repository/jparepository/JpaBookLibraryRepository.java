@@ -4,7 +4,7 @@ import com.intexsoft.model.Book;
 import com.intexsoft.model.BookLibrary;
 import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.model.Library;
-import com.intexsoft.repository.LibraryBookRepository;
+import com.intexsoft.repository.BookLibraryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbJpa")
-public class JpaLibraryBookRepository extends JpaCommonRepository<BookLibrary, BookLibraryId> implements LibraryBookRepository {
+public class JpaBookLibraryRepository extends JpaCommonRepository<BookLibrary, BookLibraryId> implements BookLibraryRepository {
 
     @Autowired
     private EntityManager em;
