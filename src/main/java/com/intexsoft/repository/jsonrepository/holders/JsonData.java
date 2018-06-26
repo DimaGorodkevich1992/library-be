@@ -1,7 +1,7 @@
 package com.intexsoft.repository.jsonrepository.holders;
 
 import com.intexsoft.model.Book;
-import com.intexsoft.model.BookLibrary;
+import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.model.Library;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -14,5 +14,5 @@ public class JsonData {
 
     private List<Book> books;
     private List<Library> libraries;
-    private List<BookLibrary> bookLibraries;
+    private List<BookLibraryId> bookLibraryIds;
 }

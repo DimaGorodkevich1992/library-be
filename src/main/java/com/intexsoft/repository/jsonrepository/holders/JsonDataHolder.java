@@ -3,6 +3,8 @@ package com.intexsoft.repository.jsonrepository.holders;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intexsoft.model.Book;
+import com.intexsoft.model.BookLibrary;
+import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.model.Library;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -33,16 +35,17 @@ public class JsonDataHolder {
     @Getter
     private JsonData jsonData;
 
+    private boolean initialized = false;
+
     private JsonData getData() {
         List<Book> books = new CopyOnWriteArrayList<>();
         List<Library> libraries = new CopyOnWriteArrayList<>();
-
+        List<BookLibraryId> bookLibraryIds = new CopyOnWriteArrayList<>();
         return new JsonData()
                 .setBooks(books)
-                .setLibraries(libraries);
+                .setLibraries(libraries)
+                .setBookLibraryIds(bookLibraryIds);
     }
-
-    private boolean initialized = false;
 
     private void getFileToList() {
         BufferedInputStream bufferedInputStream = null;

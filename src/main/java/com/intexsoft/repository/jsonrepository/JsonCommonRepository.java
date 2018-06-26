@@ -2,33 +2,29 @@ package com.intexsoft.repository.jsonrepository;
 
 import com.intexsoft.model.CommonModel;
 import com.intexsoft.repository.CommonRepository;
-import com.intexsoft.repository.jsonrepository.holders.JsonDataHolder;
+import com.intexsoft.repository.jsonrepository.holders.JsonRelation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 import static java.util.stream.Collectors.toList;
 
 @Slf4j
 public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extends Serializable> implements CommonRepository<E, I> {
 
-    @Autowired
-    private JsonDataHolder jsonDataHolder;
-
     @Override
     public I getGeneratedId(E e) {
         return e.getId();
     }
 
-    protected abstract void getEntity(E e);
-
     protected abstract List<E> getData();
+
+    protected abstract List<JsonRelation<I>> getRelation();
 
     @Override
     public E getById(I id) {
@@ -38,7 +34,6 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extend
                 .findFirst()
                 .orElse(null);
     }
-
 
     @Override
     public E save(E e) {
@@ -81,6 +76,18 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extend
                 .collect(toList());
     }
 
+    @Override
+    public void deleteById(I id) {
+        getData().remove(getById(id));
+    }
+
+    private List<JsonRelation<I>> searchRelation(List<JsonRelation<I>> fromRelation, UUID id) {
+        return fromRelation.stream()
+                .filter(r -> Objects.equals(r.getIdLeft(), id) || Objects.equals(r.getIdRight(), id))
+                .collect(toList());
+
+    }
+
     private boolean getCriteria(E e, Map.Entry<String, Object> searchCriteria) {
         try {
             return (searchCriteria.getValue() == null ||
@@ -88,10 +95,5 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extend
         } catch (ReflectiveOperationException ex) {
             return false;
         }
-    }
-
-    @Override
-    public void deleteById(I id) {
-        getData().remove(getById(id));
     }
 }

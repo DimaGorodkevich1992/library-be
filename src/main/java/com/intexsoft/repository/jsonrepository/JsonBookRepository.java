@@ -1,9 +1,12 @@
 package com.intexsoft.repository.jsonrepository;
 
 import com.intexsoft.model.Book;
+import com.intexsoft.model.BookLibraryId;
+import com.intexsoft.model.CommonModel;
 import com.intexsoft.model.Library;
 import com.intexsoft.repository.BookRepository;
 import com.intexsoft.repository.jsonrepository.holders.JsonDataHolder;
+import com.intexsoft.repository.jsonrepository.holders.JsonRelation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -15,47 +18,48 @@ import java.util.stream.Collectors;
 @ConditionalOnProperty(name = "datasource.name", havingValue = "local")
 public class JsonBookRepository extends JsonCommonRepository<Book, UUID> implements BookRepository {
 
+    @Autowired
+    private JsonDataHolder jsonDataHolder;
+
+    @Override
+    protected List<JsonRelation<UUID>> getRelation() {
+        return null;
+    }
+
     @Override
     public UUID getGeneratedId(Book book) {
         return UUID.randomUUID();
     }
 
-    @Autowired
-    private JsonDataHolder jsonDataHolder;
-
     @Override
-    protected void getEntity(Book book) {
+    protected List<Book> getData() {
+        return jsonDataHolder.getJsonData().getBooks();
     }
 
     @Override
     public Book getByIdWithLibraries(UUID id) {
-        List<UUID> librariesId = jsonDataHolder
-                .getJsonData()
-                .getBookLibraries()
-                .stream()
-                .filter(bl -> Objects.equals(bl.getBook().getId(), id))
-                .map(bl -> bl.getLibrary().getId())
-                .collect(Collectors.toList());
-        Set<Library> libraries = jsonDataHolder
+       /* List<Library> libraries =  jsonDataHolder
                 .getJsonData()
                 .getLibraries()
                 .stream()
-                .filter(library -> librariesId
-                        .stream()
-                        .anyMatch(libId -> getCriteria(library, id)))
-                .collect(Collectors.toSet());
-
-      //  return getById(id).setLibraries(libraries);
-        return null;
+                .filter(library ->
+                        searchRelation(new jsonDataHolder.getJsonData().getBookLibraryIds(), id)
+                                .stream()
+                                .map(BookLibraryId::getLibraryId)
+                                .anyMatch(uuid -> getCriteria(library, uuid)))
+                .collect(Collectors.toList());*/
+         return getById(id);
     }
 
-    private boolean getCriteria(Library library, UUID uuid) {
-        return Objects.equals(library.getId(), uuid);
+    private List<BookLibraryId> searchRelation(List<BookLibraryId> fromRelation, UUID id) {
+        return fromRelation.stream()
+                .filter(bl -> Objects.equals(bl.getBookId(), id) || Objects.equals(bl.getLibraryId(), id))
+                .collect(Collectors.toList());
+
     }
 
-    @Override
-    protected List<Book> getData() {
-        return jsonDataHolder.getJsonData().getBooks();
+    private <T extends CommonModel> boolean getCriteria(T entity, UUID uuid) {
+        return Objects.equals(entity.getId(), uuid);
     }
 
     @Override

@@ -16,13 +16,18 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "datasource.name", havingValue = "local")
 public class JsonLibraryRepository extends JsonCommonRepository<Library, UUID> implements LibraryRepository {
 
+    @Autowired
+    private JsonDataHolder jsonDataHolder;
+
     @Override
     public UUID getGeneratedId(Library library) {
         return UUID.randomUUID();
     }
 
-    @Autowired
-    private JsonDataHolder jsonDataHolder;
+    @Override
+    protected List<Library> getData() {
+        return jsonDataHolder.getJsonData().getLibraries();
+    }
 
     @Override
     public Library getByIdWithBooks(UUID id) {
@@ -37,12 +42,4 @@ public class JsonLibraryRepository extends JsonCommonRepository<Library, UUID> i
         return search(searchCriterias);
     }
 
-    @Override
-    protected void getEntity(Library library) {
-    }
-
-    @Override
-    protected List<Library> getData() {
-        return jsonDataHolder.getJsonData().getLibraries();
-    }
 }
