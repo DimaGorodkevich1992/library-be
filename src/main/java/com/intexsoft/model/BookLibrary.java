@@ -10,7 +10,6 @@ import javax.persistence.*;
 @Data
 @EqualsAndHashCode(callSuper = true, exclude = {"book", "library"})
 @Accessors(chain = true)
-@ToString(exclude = {"book", "library"})
 @Entity
 @Table(name = "books_libraries")
 public class BookLibrary extends CommonModel<BookLibraryId, BookLibrary> {

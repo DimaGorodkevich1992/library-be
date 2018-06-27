@@ -3,12 +3,9 @@ package com.intexsoft.repository.sqlrepository;
 import com.intexsoft.model.Book;
 import com.intexsoft.repository.BookRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 
