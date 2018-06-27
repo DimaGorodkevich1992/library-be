@@ -42,6 +42,11 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
     }
 
     @Override
+    public I getGeneratedId(E e) {
+        return null;
+    }
+
+    @Override
     public E getById(I id) {
         return jdbcTemplate.query(sqlGetById(), new MapSqlParameterSource("id", id), mapper)
                 .stream()
@@ -85,10 +90,5 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
     @Override
     public void deleteById(I id) {
         jdbcTemplate.update(sqlDelete(), new MapSqlParameterSource("id", id));
-    }
-
-    @Override
-    public I getGeneratedId(E e) {
-        return null;
     }
 }

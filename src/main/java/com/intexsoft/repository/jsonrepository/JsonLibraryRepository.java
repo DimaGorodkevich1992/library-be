@@ -43,7 +43,7 @@ public class JsonLibraryRepository extends JsonCommonRepository<Library, UUID> i
                     .filter(book -> searchRelation(jsonDataHolder.getJsonData().getBookLibraryIds(), id)
                             .stream()
                             .map(JsonRelation::getLeftEntityId)
-                            .anyMatch(uuid -> getCriteriaForSearchRelation(book, uuid)))
+                            .anyMatch(uuid -> isMatchRelation(book, uuid)))
                     .collect(toList());
             Set<BookLibrary> bookLibraries = books                                       //todo
                     .stream()

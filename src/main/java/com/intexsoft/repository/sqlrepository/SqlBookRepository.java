@@ -3,9 +3,12 @@ package com.intexsoft.repository.sqlrepository;
 import com.intexsoft.model.Book;
 import com.intexsoft.repository.BookRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -13,13 +16,10 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implements BookRepository {
 
-    @Override
-    public Book getByIdWithLibraries(UUID id) {
-        return null;
-    }
+
 
     @Override
-    public List<Book> searchBook(String name, String author) {
+    public Book getByIdWithLibraries(UUID id) {
         return null;
     }
 
@@ -31,7 +31,6 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
                     "books.author, " +
                     "books.number_pages, " +
                     "books.version AS books_version, " +
-                    "books.library_id, " +
                     "library.id AS library_id, " +
                     "library.name AS library_name, " +
                     "library.address, " +
@@ -45,7 +44,7 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
 
     @Override
     protected String sqlSave() {
-        return "INSERT INTO books (id, name, published, author, number_pages, version, library_id) VALUES (:id, :name, :published, :author, :number_pages, :version, :library_id)";
+        return "INSERT INTO books (id, name, published, author, number_pages, version) VALUES (:id, :name, :published, :author, :number_pages, :version)";
     }
 
     @Override
@@ -65,25 +64,22 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
     }
 
 
-/*
     @Override
     protected MapSqlParameterSource getCommonParametersSource(Book book) {
         return super.getCommonParametersSource(book)
                 .addValue("name", book.getName())
                 .addValue("published", book.getPublished())
                 .addValue("author", book.getAuthor())
-                .addValue("number_pages", book.getNumberPages())
-                .addValue("library_id", book.getLibrary().getId());
+                .addValue("number_pages", book.getNumberPages());
     }
 
     @Override
-    public List<Book> searchLibrary(String name, String author) {
+    public List<Book> searchBook(String name, String author) {
         Map<String, Object> searchCriterias = new HashMap<>();
         searchCriterias.put("name", name);
         searchCriterias.put("author", author);
         return search(searchCriterias);
     }
-*/
 
 
 }

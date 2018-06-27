@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
+import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
 
@@ -79,15 +79,32 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extend
         getData().remove(getById(id));
     }
 
-    protected List<JsonRelation<I>> searchRelation(List<JsonRelation<I>> fromRelation, UUID id) {
-        return fromRelation.stream()
-                .filter(r -> Objects.equals(r.getLeftEntityId(), id) || Objects.equals(r.getRightEntityId(), id))
+    protected <R extends JsonRelation<I>> Predicate<R> getPredicate(E e) {
+        return null;
+    }
+
+    protected abstract <R extends JsonRelation<I>> I getId(R r);
+
+    protected <T extends CommonModel<I, T>, R extends JsonRelation<I>> List<T> searchAtta(Class<T> target, List<T> from, List<R> relation, E criteriaEntity) {
+        return from
+                .stream()
+                .filter(entity -> searchRelation(relation, getPredicate(criteriaEntity))
+                        .stream()
+                        .anyMatch(id -> isMatchRelation(entity, criteriaEntity)))
                 .collect(toList());
 
     }
 
-    protected <T extends CommonModel> boolean getCriteriaForSearchRelation(T entity, UUID uuid) {
-        return Objects.equals(entity.getId(), uuid);
+    protected <R extends JsonRelation<I>> List<I> searchRelation(List<R> fromRelation, Predicate<R> p) {
+        return fromRelation.stream()
+                .filter(p)
+                .map(this::getId)
+                .collect(toList());
+
+    }
+
+    protected <T extends CommonModel<I, T>> boolean isMatchRelation(T entity, E criteriaEntity) {
+        return Objects.equals(entity.getId(), criteriaEntity.getId());
     }
 
     private boolean getCriteriaForSearch(E e, Map.Entry<String, Object> searchCriteria) {

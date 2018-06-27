@@ -22,11 +22,12 @@ public class SqlBookMapper extends CommonMapper<Book, UUID> {
 
     @Override
     public Book mapRow(ResultSet resultSet, int i) throws SQLException {
-        return super.mapRow(resultSet, i)
+        Book book = super.mapRow(resultSet, i)
                 .setName(resultSet.getString("books_name"))
                 .setAuthor(resultSet.getString("author"))
                 .setPublished(resultSet.getDate("published"))
                 .setNumberPages(resultSet.getInt("number_pages"));
+                    return null;
     }
 
     @Override

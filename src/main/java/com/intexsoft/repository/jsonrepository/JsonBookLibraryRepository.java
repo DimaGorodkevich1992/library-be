@@ -22,6 +22,11 @@ import static java.util.stream.Collectors.toList;
 @ConditionalOnProperty(name = "datasource.name", havingValue = "local")
 public class JsonBookLibraryRepository extends JsonCommonRepository<BookLibrary, BookLibraryId> implements BookLibraryRepository {
 
+    @Override
+    protected <R extends JsonRelation<BookLibraryId>> BookLibraryId getId(R r) {
+        return null;
+    }
+
     @Autowired
     private JsonDataHolder jsonDataHolder;
 
@@ -35,7 +40,7 @@ public class JsonBookLibraryRepository extends JsonCommonRepository<BookLibrary,
 
     @Override
     public List<Book> searchBooks(UUID libraryId) {
-        return jsonDataHolder
+        /*return jsonDataHolder
                 .getJsonData()
                 .getBooks()
                 .stream()
@@ -43,13 +48,14 @@ public class JsonBookLibraryRepository extends JsonCommonRepository<BookLibrary,
                         search(getConvertedId(), libraryId)
                                 .stream()
                                 .map(BookLibraryId::getBookId)
-                                .anyMatch(id -> getCriteriaForSearchRelation(book, id)))
-                .collect(toList());
+                                .anyMatch(id -> isMatchRelation(book, id)))
+                .collect(toList());*/
+        return null;
     }
 
     @Override
     public List<Library> searchLibraries(UUID bookId) {
-        return jsonDataHolder
+       /* return jsonDataHolder
                 .getJsonData()
                 .getLibraries()
                 .stream()
@@ -57,8 +63,9 @@ public class JsonBookLibraryRepository extends JsonCommonRepository<BookLibrary,
                         search(getConvertedId(), bookId)
                                 .stream()
                                 .map(BookLibraryId::getLibraryId)
-                                .anyMatch(id -> getCriteriaForSearchRelation(library, id)))
-                .collect(toList());
+                                .anyMatch(id -> isMatchRelation(library, id)))
+                .collect(toList());*/
+       return null;
     }
 
     private List<BookLibraryId> getConvertedId() {
