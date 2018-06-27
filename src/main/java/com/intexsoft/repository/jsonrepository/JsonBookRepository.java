@@ -22,18 +22,18 @@ import static java.util.stream.Collectors.toSet;
 @ConditionalOnProperty(name = "datasource.name", havingValue = "local")
 public class JsonBookRepository extends JsonCommonRepository<Book, UUID> implements BookRepository {
 
+    @Autowired
+    private JsonDataHolder jsonDataHolder;
+
     @Override
     protected <R extends JsonRelation<UUID>> Predicate<R> getPredicate(Book book) {
-        return p-> p.getLeftEntityId().equals(book.getId());
+        return p -> p.getLeftEntityId().equals(book.getId());
     }
 
     @Override
     protected <R extends JsonRelation<UUID>> UUID getId(R r) {
         return r.getRightEntityId();
     }
-
-    @Autowired
-    private JsonDataHolder jsonDataHolder;
 
     @Override
     public UUID getGeneratedId(Book book) {
@@ -45,13 +45,12 @@ public class JsonBookRepository extends JsonCommonRepository<Book, UUID> impleme
         return jsonDataHolder.getJsonData().getBooks();
     }
 
-
     @Override
     public Book getByIdWithLibraries(UUID id) {
         Book book = getById(id);
         JsonData jsonData = jsonDataHolder.getJsonData();
 
-        Set<BookLibrary> bookLibraries = searchAtta(Library.class,jsonData.getLibraries(),jsonData.getBookLibraryIds(),book)
+        Set<BookLibrary> bookLibraries = searchAtta(jsonData.getLibraries(), jsonData.getBookLibraryIds(), book)
                 .stream()
                 .map(library -> new BookLibrary()
                         .setId(new BookLibraryId().setBookId(id).setLibraryId(library.getId()))

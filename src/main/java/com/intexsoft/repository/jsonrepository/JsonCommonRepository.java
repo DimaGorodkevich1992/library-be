@@ -1,5 +1,7 @@
 package com.intexsoft.repository.jsonrepository;
 
+import com.intexsoft.model.BookLibrary;
+import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.model.CommonModel;
 import com.intexsoft.repository.CommonRepository;
 import com.intexsoft.repository.jsonrepository.holders.JsonRelation;
@@ -10,9 +12,11 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Slf4j
 public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extends Serializable> implements CommonRepository<E, I> {
@@ -22,7 +26,17 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extend
         return e.getId();
     }
 
+    protected <T extends CommonModel<I,T>> T getModel(){
+        return null;
+    }
+
+    protected abstract <R extends JsonRelation<I>> I getId(R r);
+
     protected abstract List<E> getData();
+
+    protected <R extends JsonRelation<I>> Predicate<R> getPredicate(E e) {
+        return null;
+    }
 
     @Override
     public E getById(I id) {
@@ -79,34 +93,6 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extend
         getData().remove(getById(id));
     }
 
-    protected <R extends JsonRelation<I>> Predicate<R> getPredicate(E e) {
-        return null;
-    }
-
-    protected abstract <R extends JsonRelation<I>> I getId(R r);
-
-    protected <T extends CommonModel<I, T>, R extends JsonRelation<I>> List<T> searchAtta(Class<T> target, List<T> from, List<R> relation, E criteriaEntity) {
-        return from
-                .stream()
-                .filter(entity -> searchRelation(relation, getPredicate(criteriaEntity))
-                        .stream()
-                        .anyMatch(id -> isMatchRelation(entity, criteriaEntity)))
-                .collect(toList());
-
-    }
-
-    protected <R extends JsonRelation<I>> List<I> searchRelation(List<R> fromRelation, Predicate<R> p) {
-        return fromRelation.stream()
-                .filter(p)
-                .map(this::getId)
-                .collect(toList());
-
-    }
-
-    protected <T extends CommonModel<I, T>> boolean isMatchRelation(T entity, E criteriaEntity) {
-        return Objects.equals(entity.getId(), criteriaEntity.getId());
-    }
-
     private boolean getCriteriaForSearch(E e, Map.Entry<String, Object> searchCriteria) {
         try {
             return (searchCriteria.getValue() == null ||
@@ -115,4 +101,36 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extend
             return false;
         }
     }
+
+    protected <T extends CommonModel<I, T>, R extends JsonRelation<I>> List<T> searchAtta(List<T> from, List<R> relation, E criteriaEntity) {
+        return from
+                .stream()
+                .filter(entity -> searchRelation(relation, getPredicate(criteriaEntity), criteriaEntity))
+                .collect(toList());
+
+    }
+
+    /*private <LE extends CommonModel<I, LE>, RI extends CommonModel<I, RI>, T> Set<T> getAtt(List<T> from, LE leftEntity, RI rightEntity) {
+        from.stream().map(t ->  )
+
+    }
+
+    Set<BookLibrary> bookLibraries = searchAtta(jsonData.getBooks(), jsonData.getBookLibraryIds(), library)
+            .stream()
+            .map(book -> new BookLibrary()
+                    .setId(new BookLibraryId().setBookId(id).setLibraryId(library.getId()))
+                    .setBook(book)
+                    .setLibrary(library))
+            .collect(toSet());
+        return library.setBooks(bookLibraries);
+}*/
+
+    protected <R extends JsonRelation<I>> boolean searchRelation(List<R> fromRelation, Predicate<R> p, E criteriaEntity) {
+        return fromRelation.stream()
+                .filter(p)
+                .map(this::getId)
+                .anyMatch(i -> Objects.equals(i, criteriaEntity.getId()));
+
+    }
+
 }
