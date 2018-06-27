@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Accessors(chain = true)
 public class JsonRelation<R extends Serializable> {
 
-    private R idLeft;
-    private R idRight;
+    private R leftEntityId;
+    private R rightEntityId;
 
 }

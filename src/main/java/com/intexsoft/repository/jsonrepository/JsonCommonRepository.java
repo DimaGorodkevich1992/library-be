@@ -24,8 +24,6 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extend
 
     protected abstract List<E> getData();
 
-    protected abstract List<JsonRelation<I>> getRelation();
-
     @Override
     public E getById(I id) {
         return getData()
@@ -72,7 +70,7 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extend
                 .filter(entry -> searchCriterias
                         .entrySet()
                         .stream()
-                        .allMatch(searchCriteria -> getCriteria(entry, searchCriteria)))
+                        .allMatch(searchCriteria -> getCriteriaForSearch(entry, searchCriteria)))
                 .collect(toList());
     }
 
@@ -81,14 +79,18 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extend
         getData().remove(getById(id));
     }
 
-    private List<JsonRelation<I>> searchRelation(List<JsonRelation<I>> fromRelation, UUID id) {
+    protected List<JsonRelation<I>> searchRelation(List<JsonRelation<I>> fromRelation, UUID id) {
         return fromRelation.stream()
-                .filter(r -> Objects.equals(r.getIdLeft(), id) || Objects.equals(r.getIdRight(), id))
+                .filter(r -> Objects.equals(r.getLeftEntityId(), id) || Objects.equals(r.getRightEntityId(), id))
                 .collect(toList());
 
     }
 
-    private boolean getCriteria(E e, Map.Entry<String, Object> searchCriteria) {
+    protected <T extends CommonModel> boolean getCriteriaForSearchRelation(T entity, UUID uuid) {
+        return Objects.equals(entity.getId(), uuid);
+    }
+
+    private boolean getCriteriaForSearch(E e, Map.Entry<String, Object> searchCriteria) {
         try {
             return (searchCriteria.getValue() == null ||
                     Objects.equals(BeanUtils.getProperty(e, searchCriteria.getKey()), searchCriteria.getValue()));

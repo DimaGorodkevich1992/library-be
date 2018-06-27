@@ -1,5 +1,6 @@
 package com.intexsoft.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -21,14 +22,14 @@ public class Library extends CommonModel<UUID, Library> {
     private UUID id;
     private String name;
     private String address;
+    @JsonIgnore
+    @OneToMany(mappedBy = "library")
+    private Set<BookLibrary> books = new HashSet<>();
 
     @Override
     protected Library getModel() {
         return this;
     }
-
-    @OneToMany(mappedBy = "library")
-    private Set<BookLibrary> books = new HashSet<>();
 
     @Override
     public UUID getId() {

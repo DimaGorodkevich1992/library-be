@@ -3,8 +3,6 @@ package com.intexsoft.repository.jsonrepository.holders;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intexsoft.model.Book;
-import com.intexsoft.model.BookLibrary;
-import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.model.Library;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +16,13 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.*;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "local")
 public class JsonDataHolder {
-
 
     @Value("${datasource.local.path}")
     private String localPath;
@@ -40,7 +38,7 @@ public class JsonDataHolder {
     private JsonData getData() {
         List<Book> books = new CopyOnWriteArrayList<>();
         List<Library> libraries = new CopyOnWriteArrayList<>();
-        List<BookLibraryId> bookLibraryIds = new CopyOnWriteArrayList<>();
+        List<JsonRelation<UUID>> bookLibraryIds = new CopyOnWriteArrayList<>();
         return new JsonData()
                 .setBooks(books)
                 .setLibraries(libraries)
@@ -80,7 +78,6 @@ public class JsonDataHolder {
             }
         }
     }
-
 
     public String getPathFile() {
         File filePath = new File(localPath, fileName);

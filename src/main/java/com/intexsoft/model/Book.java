@@ -1,5 +1,6 @@
 package com.intexsoft.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -25,6 +26,7 @@ public class Book extends CommonModel<UUID, Book> {
     private String author;
     @Column(name = "number_pages")
     private Integer numberPages;
+    @JsonIgnore
     @OneToMany(mappedBy = "book")
     private Set<BookLibrary> libraries = new HashSet<>();
 

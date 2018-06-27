@@ -1,8 +1,12 @@
 package com.intexsoft.repository.jsonrepository;
 
-import com.intexsoft.model.*;
+import com.intexsoft.model.Book;
+import com.intexsoft.model.BookLibrary;
+import com.intexsoft.model.BookLibraryId;
+import com.intexsoft.model.Library;
 import com.intexsoft.repository.BookLibraryRepository;
 import com.intexsoft.repository.jsonrepository.holders.JsonDataHolder;
+import com.intexsoft.repository.jsonrepository.holders.JsonRelation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -23,7 +27,9 @@ public class JsonBookLibraryRepository extends JsonCommonRepository<BookLibrary,
 
     @Override
     public BookLibrary save(BookLibrary bookLibrary) {
-        jsonDataHolder.getJsonData().getBookLibraryIds().add(bookLibrary.getId());
+        jsonDataHolder.getJsonData().getBookLibraryIds().add(new JsonRelation<UUID>()
+                .setLeftEntityId(bookLibrary.getId().getBookId())
+                .setRightEntityId(bookLibrary.getId().getLibraryId()));
         return bookLibrary;
     }
 
@@ -34,10 +40,10 @@ public class JsonBookLibraryRepository extends JsonCommonRepository<BookLibrary,
                 .getBooks()
                 .stream()
                 .filter(book ->
-                        searchRelation(jsonDataHolder.getJsonData().getBookLibraryIds(), libraryId)
+                        search(getConvertedId(), libraryId)
                                 .stream()
                                 .map(BookLibraryId::getBookId)
-                                .anyMatch(id -> getCriteria(book, id)))
+                                .anyMatch(id -> getCriteriaForSearchRelation(book, id)))
                 .collect(toList());
     }
 
@@ -48,22 +54,30 @@ public class JsonBookLibraryRepository extends JsonCommonRepository<BookLibrary,
                 .getLibraries()
                 .stream()
                 .filter(library ->
-                        searchRelation(jsonDataHolder.getJsonData().getBookLibraryIds(), bookId)
+                        search(getConvertedId(), bookId)
                                 .stream()
                                 .map(BookLibraryId::getLibraryId)
-                                .anyMatch(id -> getCriteria(library, id)))
+                                .anyMatch(id -> getCriteriaForSearchRelation(library, id)))
                 .collect(toList());
     }
 
-    private List<BookLibraryId> searchRelation(List<BookLibraryId> fromRelation, UUID id) {
+    private List<BookLibraryId> getConvertedId() {
+        return jsonDataHolder
+                .getJsonData()
+                .getBookLibraryIds()
+                .stream()
+                .map(s -> new BookLibraryId()
+                        .setBookId(s.getLeftEntityId())
+                        .setLibraryId(s.getRightEntityId()))
+                .collect(toList());
+
+    }
+
+    private List<BookLibraryId> search(List<BookLibraryId> fromRelation, UUID id) {
         return fromRelation.stream()
                 .filter(bl -> Objects.equals(bl.getBookId(), id) || Objects.equals(bl.getLibraryId(), id))
                 .collect(toList());
 
-    }
-
-    private <T extends CommonModel> boolean getCriteria(T entity, UUID uuid) {
-        return Objects.equals(entity.getId(), uuid);
     }
 
     @Override
