@@ -45,9 +45,8 @@ public abstract class JpaCommonRepository<E extends CommonModel<I, E>, I extends
                 }
             }
         }
-        query.where(cb.equal(from.get("id"),id));
+        query.where(cb.equal(from.get("id"), id));
         em.createQuery(query).getSingleResult();
-        E e = em.createQuery(query).getSingleResult();
         return em.createQuery(query).getSingleResult();
     }
 

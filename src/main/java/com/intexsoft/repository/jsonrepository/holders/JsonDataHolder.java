@@ -15,9 +15,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 @Slf4j
 @Component
@@ -36,9 +35,9 @@ public class JsonDataHolder {
     private boolean initialized = false;
 
     private JsonData getData() {
-        List<Book> books = new CopyOnWriteArrayList<>();
-        List<Library> libraries = new CopyOnWriteArrayList<>();
-        List<JsonRelation<UUID>> bookLibraryIds = new CopyOnWriteArrayList<>();
+        List<Book> books = new ArrayList<>();
+        List<Library> libraries = new ArrayList<>();
+        List<JsonBookLibrary> bookLibraryIds = new ArrayList<>();
         return new JsonData()
                 .setBooks(books)
                 .setLibraries(libraries)

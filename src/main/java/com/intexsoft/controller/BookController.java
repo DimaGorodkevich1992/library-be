@@ -5,7 +5,6 @@ import com.intexsoft.controller.dtomapper.BookDtoMapperWithLibraries;
 import com.intexsoft.controller.dtomapper.LibraryDtoMapper;
 import com.intexsoft.dto.BookDto;
 import com.intexsoft.dto.BookDtoWithLibraries;
-import com.intexsoft.dto.LibraryDto;
 import com.intexsoft.service.BookService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -77,20 +76,6 @@ public class BookController extends CommonController {
         DeferredResult<List<BookDto>> result = getDeferredResult();
         Subscription subscription = bookService.searchBook(bookName, bookAuthor)
                 .map(bookDtoMapper::toDto)
-                .toList()
-                .compose(convertToDeferredResult(result))
-                .subscribe();
-        result.onCompletion(subscription::unsubscribe);
-        return result;
-    }
-
-    @GetMapping("/{id}/libraries")
-    public DeferredResult<List<LibraryDto>> getLibraryForBook(
-            @ApiParam(required = true, name = "id", value = "ID from the book to find libraries")
-            @PathVariable("id") UUID id) {
-        DeferredResult<List<LibraryDto>> result = getDeferredResult();
-        Subscription subscription = bookService.searchLibraries(id)
-                .map(libraryDtoMapper::toDto)
                 .toList()
                 .compose(convertToDeferredResult(result))
                 .subscribe();

@@ -7,9 +7,9 @@ import java.io.Serializable;
 
 @Data
 @Accessors(chain = true)
-public class JsonRelation<R extends Serializable> {
+public class JsonRelationID<R1 extends Serializable, R2 extends Serializable> {
 
-    private R leftEntityId;
-    private R rightEntityId;
+    private R1 leftEntityId;
+    private R2 rightEntityId;
 
 }

@@ -3,11 +3,10 @@ package com.intexsoft.repository.jsonrepository;
 import com.intexsoft.model.Book;
 import com.intexsoft.model.BookLibrary;
 import com.intexsoft.model.BookLibraryId;
-import com.intexsoft.model.Library;
 import com.intexsoft.repository.BookRepository;
 import com.intexsoft.repository.jsonrepository.holders.JsonData;
 import com.intexsoft.repository.jsonrepository.holders.JsonDataHolder;
-import com.intexsoft.repository.jsonrepository.holders.JsonRelation;
+import com.intexsoft.repository.jsonrepository.holders.JsonRelationID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 @Component
@@ -26,12 +24,12 @@ public class JsonBookRepository extends JsonCommonRepository<Book, UUID> impleme
     private JsonDataHolder jsonDataHolder;
 
     @Override
-    protected <R extends JsonRelation<UUID>> Predicate<R> getPredicate(Book book) {
+    protected <R extends JsonRelationID<UUID, UUID>> Predicate<R> getPredicate(Book book) {
         return p -> p.getLeftEntityId().equals(book.getId());
     }
 
     @Override
-    protected <R extends JsonRelation<UUID>> UUID getId(R r) {
+    protected <R extends JsonRelationID<UUID, UUID>> UUID getId(R r) {
         return r.getRightEntityId();
     }
 
@@ -49,8 +47,7 @@ public class JsonBookRepository extends JsonCommonRepository<Book, UUID> impleme
     public Book getByIdWithLibraries(UUID id) {
         Book book = getById(id);
         JsonData jsonData = jsonDataHolder.getJsonData();
-
-        Set<BookLibrary> bookLibraries = searchAtta(jsonData.getLibraries(), jsonData.getBookLibraryIds(), book)
+        Set<BookLibrary> bookLibraries = searchItems(jsonData.getLibraries(), jsonData.getBookLibraryIds(), book)
                 .stream()
                 .map(library -> new BookLibrary()
                         .setId(new BookLibraryId().setBookId(id).setLibraryId(library.getId()))

@@ -1,10 +1,8 @@
 package com.intexsoft.repository.jsonrepository;
 
-import com.intexsoft.model.BookLibrary;
-import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.model.CommonModel;
 import com.intexsoft.repository.CommonRepository;
-import com.intexsoft.repository.jsonrepository.holders.JsonRelation;
+import com.intexsoft.repository.jsonrepository.holders.JsonRelationID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -21,21 +19,25 @@ import static java.util.stream.Collectors.toSet;
 @Slf4j
 public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extends Serializable> implements CommonRepository<E, I> {
 
-    @Override
-    public I getGeneratedId(E e) {
-        return e.getId();
+    protected <T extends CommonModel<ID, T>, F extends CommonModel<I, F>, ID extends Serializable> T getItem(T target, F from, E entity, ID targetId) {
+        return target;
     }
 
-    protected <T extends CommonModel<I,T>> T getModel(){
+    protected <T extends CommonModel<I, T>> T getModel() {
         return null;
     }
 
-    protected abstract <R extends JsonRelation<I>> I getId(R r);
+    protected abstract <R extends JsonRelationID<I, I>> I getId(R r);
 
     protected abstract List<E> getData();
 
-    protected <R extends JsonRelation<I>> Predicate<R> getPredicate(E e) {
+    protected <R extends JsonRelationID<I, I>> Predicate<R> getPredicate(E e) {
         return null;
+    }
+
+    @Override
+    public I getGeneratedId(E e) {
+        return e.getId();
     }
 
     @Override
@@ -102,35 +104,27 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extend
         }
     }
 
-    protected <T extends CommonModel<I, T>, R extends JsonRelation<I>> List<T> searchAtta(List<T> from, List<R> relation, E criteriaEntity) {
-        return from
+    protected <T extends CommonModel<I, T>, R extends JsonRelationID<I, I>> List<T> searchItems(List<T> target, List<R> relation, E criteriaEntity) {
+        return target
                 .stream()
-                .filter(entity -> searchRelation(relation, getPredicate(criteriaEntity), criteriaEntity))
+                .filter(entity -> isMathRelation(relation, getPredicate(criteriaEntity), criteriaEntity))
                 .collect(toList());
 
     }
 
-    /*private <LE extends CommonModel<I, LE>, RI extends CommonModel<I, RI>, T> Set<T> getAtt(List<T> from, LE leftEntity, RI rightEntity) {
-        from.stream().map(t ->  )
-
-    }
-
-    Set<BookLibrary> bookLibraries = searchAtta(jsonData.getBooks(), jsonData.getBookLibraryIds(), library)
-            .stream()
-            .map(book -> new BookLibrary()
-                    .setId(new BookLibraryId().setBookId(id).setLibraryId(library.getId()))
-                    .setBook(book)
-                    .setLibrary(library))
-            .collect(toSet());
-        return library.setBooks(bookLibraries);
-}*/
-
-    protected <R extends JsonRelation<I>> boolean searchRelation(List<R> fromRelation, Predicate<R> p, E criteriaEntity) {
+    protected <R extends JsonRelationID<I, I>> boolean isMathRelation(List<R> fromRelation, Predicate<R> predicate, E criteriaEntity) {
         return fromRelation.stream()
-                .filter(p)
+                .filter(predicate)
                 .map(this::getId)
                 .anyMatch(i -> Objects.equals(i, criteriaEntity.getId()));
 
+    }
+
+    protected <T extends CommonModel<ID, T>, F extends CommonModel<I, F>,ID extends Serializable > Set<T> getItemSet(T target, List<F> from, E entity, ID targetId) {
+        return from
+                .stream()
+                .map(f -> getItem(target, f, entity,targetId))
+                .collect(toSet());
     }
 
 }

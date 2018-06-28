@@ -11,19 +11,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlLibraryRepository extends SqlCommonRepository<Library, UUID> implements LibraryRepository {
 
+    private static final String SQL_SELECT_WITH_MAPPING =
+            "SELECT " +
+                    "libraries.id AS library_id, " +
+                    "libraries.name AS library_name, " +
+                    "libraries.address AS library_address, " +
+                    "libraries.version AS library_version," +
+                    "books.id AS book_id, " +
+                    "books.name AS book_name, " +
+                    "books.published AS book_published, " +
+                    "books.author AS book_author, " +
+                    "books.number_pages AS book_number_pages, " +
+                    "books.version AS book_version";
+
     @Override
     public Library getByIdWithBooks(UUID id) {
-        return null;
+        return getById(id, sqlGetByIdWithItems());
+    }
+
+    @Override
+    protected String sqlGetByIdWithItems() {
+        return SQL_SELECT_WITH_MAPPING + " " +
+                "FROM libraries, books " +
+                "INNER JOIN books_libraries AS B ON B.book_id = book.id" +
+                "WHERE libraries_id = :id";
     }
 
     @Override
     protected String sqlGetById() {
-        return "SELECT library.id AS library_id, library.name AS library_name, library.address, library.version AS library_version FROM library WHERE library.id = :id";
+        return "SELECT * FROM library WHERE library.id = :id";
     }
 
     @Override

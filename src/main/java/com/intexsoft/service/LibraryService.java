@@ -1,6 +1,5 @@
 package com.intexsoft.service;
 
-import com.intexsoft.model.Book;
 import com.intexsoft.model.BookLibrary;
 import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.model.Library;
@@ -33,12 +32,6 @@ public class LibraryService extends CommonService<Library, UUID> {
         return Observable.just(id)
                 .map(repositoryLibrary::getByIdWithBooks)
                 .filter(Objects::nonNull)
-                .subscribeOn(Schedulers.io());
-    }
-
-    public Observable<Book> searchBooks(UUID libraryId) {
-        return Observable.just(libraryId)
-                .compose(observable -> Observable.from(bookLibraryRepository.searchBooks(libraryId)))
                 .subscribeOn(Schedulers.io());
     }
 

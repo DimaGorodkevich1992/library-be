@@ -23,6 +23,8 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
+    protected abstract String sqlGetByIdWithItems();
+
     protected abstract String sqlGetById();
 
     protected abstract String sqlSave();
@@ -43,15 +45,19 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
 
     @Override
     public I getGeneratedId(E e) {
-        return null;
+        return e.getId();
+    }
+
+    public E getById(I id, String sql) {
+        return jdbcTemplate.query(sql, new MapSqlParameterSource("id", id), mapper)
+                .stream()
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public E getById(I id) {
-        return jdbcTemplate.query(sqlGetById(), new MapSqlParameterSource("id", id), mapper)
-                .stream()
-                .findFirst()
-                .orElse(null);
+        return getById(id,sqlGetById());
     }
 
     @Override

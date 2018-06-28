@@ -3,9 +3,8 @@ package com.intexsoft.service;
 import com.intexsoft.model.Book;
 import com.intexsoft.model.BookLibrary;
 import com.intexsoft.model.BookLibraryId;
-import com.intexsoft.model.Library;
-import com.intexsoft.repository.BookRepository;
 import com.intexsoft.repository.BookLibraryRepository;
+import com.intexsoft.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rx.Observable;
@@ -34,13 +33,6 @@ public class BookService extends CommonService<Book, UUID> {
                 .map(bookRepository::getByIdWithLibraries)
                 .filter(Objects::nonNull)
                 .subscribeOn(Schedulers.io());
-    }
-
-    public Observable<Library> searchLibraries(UUID bookId) {
-        return Observable.just(bookId)
-                .compose(observable -> Observable.from(bookLibraryRepository.searchLibraries(bookId)))
-                .subscribeOn(Schedulers.io());
-
     }
 
     public Observable<Book> addLibrary(UUID bookId, UUID libraryId) {

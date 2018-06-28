@@ -3,7 +3,6 @@ package com.intexsoft.controller;
 import com.intexsoft.controller.dtomapper.BookDtoMapper;
 import com.intexsoft.controller.dtomapper.LibraryDtoMapper;
 import com.intexsoft.controller.dtomapper.LibraryDtoMapperWithBooks;
-import com.intexsoft.dto.BookDto;
 import com.intexsoft.dto.LibraryDto;
 import com.intexsoft.dto.LibraryDtoWithBooks;
 import com.intexsoft.service.LibraryService;
@@ -61,20 +60,6 @@ public class LibraryController extends CommonController {
                         .map(libraryDtoMapperWithBooks::toDto) :
                 libraryService.getById(id)
                         .map(libraryDtoMapper::toDto))
-                .compose(convertToDeferredResult(result))
-                .subscribe();
-        result.onCompletion(subscription::unsubscribe);
-        return result;
-    }
-
-    @GetMapping("/{id}/books")
-    public DeferredResult<List<BookDto>> getBooksForLibrary(
-            @ApiParam(required = true, name = "id", value = "ID from the library to find books")
-            @PathVariable("id") UUID id) {
-        DeferredResult<List<BookDto>> result = getDeferredResult();
-        Subscription subscription = libraryService.searchBooks(id)
-                .map(bookDtoMapper::toDto)
-                .toList()
                 .compose(convertToDeferredResult(result))
                 .subscribe();
         result.onCompletion(subscription::unsubscribe);

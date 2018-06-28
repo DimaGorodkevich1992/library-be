@@ -1,13 +1,12 @@
 package com.intexsoft.repository.jsonrepository;
 
-import com.intexsoft.model.Book;
 import com.intexsoft.model.BookLibrary;
 import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.model.Library;
 import com.intexsoft.repository.LibraryRepository;
 import com.intexsoft.repository.jsonrepository.holders.JsonData;
 import com.intexsoft.repository.jsonrepository.holders.JsonDataHolder;
-import com.intexsoft.repository.jsonrepository.holders.JsonRelation;
+import com.intexsoft.repository.jsonrepository.holders.JsonRelationID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.function.Predicate;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 @Component
@@ -23,12 +21,12 @@ import static java.util.stream.Collectors.toSet;
 public class JsonLibraryRepository extends JsonCommonRepository<Library, UUID> implements LibraryRepository {
 
     @Override
-    protected <R extends JsonRelation<UUID>> Predicate<R> getPredicate(Library library) {
+    protected <R extends JsonRelationID<UUID, UUID>> Predicate<R> getPredicate(Library library) {
         return p -> p.getRightEntityId().equals(library.getId());
     }
 
     @Override
-    protected <R extends JsonRelation<UUID>> UUID getId(R r) {
+    protected <R extends JsonRelationID<UUID, UUID>> UUID getId(R r) {
         return r.getLeftEntityId();
     }
 
@@ -49,7 +47,8 @@ public class JsonLibraryRepository extends JsonCommonRepository<Library, UUID> i
     public Library getByIdWithBooks(UUID id) {
         Library library = getById(id);
         JsonData jsonData = jsonDataHolder.getJsonData();
-        Set<BookLibrary> bookLibraries = searchAtta(jsonData.getBooks(), jsonData.getBookLibraryIds(), library)
+
+        Set<BookLibrary> bookLibraries = searchItems(jsonData.getBooks(), jsonData.getBookLibraryIds(), library)
                 .stream()
                 .map(book -> new BookLibrary()
                         .setId(new BookLibraryId().setBookId(id).setLibraryId(library.getId()))
@@ -58,7 +57,7 @@ public class JsonLibraryRepository extends JsonCommonRepository<Library, UUID> i
                 .collect(toSet());
         return library.setBooks(bookLibraries);
     }
-
+    
     @Override
     public List<Library> searchLibrary(String name, String address) {
         Map<String, Object> searchCriterias = new HashMap<>();

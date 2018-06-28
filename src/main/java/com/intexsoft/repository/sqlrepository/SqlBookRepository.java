@@ -16,30 +16,41 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implements BookRepository {
 
+    private static final String SQL_SELECT_WITH_MAPPING =
+            "SELECT " +
+                    "books.id AS book_id, " +
+                    "books.name AS book_name, " +
+                    "books.published AS book_published " +
+                    "books.author AS book_author, " +
+                    "books.number_pages AS book_number_pages, " +
+                    "books.version AS book_version, " +
+                    "libraries.id AS library_id, " +
+                    "libraries.name AS library_name, " +
+                    "libraries.address AS library_address " +
+                    "libraries.version AS library_version";
 
+    @Override
+    public UUID getGeneratedId(Book book) {
+        return UUID.randomUUID();
+    }
 
     @Override
     public Book getByIdWithLibraries(UUID id) {
-        return null;
+        return getById(id,sqlGetByIdWithItems());
     }
 
-    private static final String SQL_SELECT_WITH_MAPPING =
-            "SELECT " +
-                    "books.id AS books_id, " +
-                    "books.name AS books_name, " +
-                    "books.published, " +
-                    "books.author, " +
-                    "books.number_pages, " +
-                    "books.version AS books_version, " +
-                    "library.id AS library_id, " +
-                    "library.name AS library_name, " +
-                    "library.address, " +
-                    "library.version AS library_version";
+    @Override
+    protected String sqlGetByIdWithItems() {
+        return SQL_SELECT_WITH_MAPPING + " " +
+                "FROM books, libraries " +
+                "INNER JOIN books_libraries AS B ON B.library_id = libraries.id " +
+                "WHERE books.id = :id";
+    }
+
 
     @Override
     protected String sqlGetById() {
-        return SQL_SELECT_WITH_MAPPING + " " +
-                "FROM books INNER JOIN libraries ON (books.libraries_id = libraries.id) WHERE books.id = :id";
+        return "SELECT * FROM books WHERE id = :id";
     }
 
     @Override
