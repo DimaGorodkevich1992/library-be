@@ -6,13 +6,11 @@ import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.repository.BookRepository;
 import com.intexsoft.repository.jsonrepository.holders.JsonData;
 import com.intexsoft.repository.jsonrepository.holders.JsonDataHolder;
-import com.intexsoft.repository.jsonrepository.holders.JsonRelationID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -22,16 +20,6 @@ public class JsonBookRepository extends JsonCommonRepository<Book, UUID> impleme
 
     @Autowired
     private JsonDataHolder jsonDataHolder;
-
-    @Override
-    protected <R extends JsonRelationID<UUID, UUID>> Predicate<R> getPredicate(Book book) {
-        return p -> p.getLeftEntityId().equals(book.getId());
-    }
-
-    @Override
-    protected <R extends JsonRelationID<UUID, UUID>> UUID getId(R r) {
-        return r.getRightEntityId();
-    }
 
     @Override
     public UUID getGeneratedId(Book book) {
@@ -47,7 +35,7 @@ public class JsonBookRepository extends JsonCommonRepository<Book, UUID> impleme
     public Book getByIdWithLibraries(UUID id) {
         Book book = getById(id);
         JsonData jsonData = jsonDataHolder.getJsonData();
-        Set<BookLibrary> bookLibraries = searchItems(jsonData.getLibraries(), jsonData.getBookLibraryIds(), book)
+        Set<BookLibrary> bookLibraries = findRightRelatedEntities(book, jsonData.getBookLibraryIds(), jsonData.getLibraries())
                 .stream()
                 .map(library -> new BookLibrary()
                         .setId(new BookLibraryId().setBookId(id).setLibraryId(library.getId()))

@@ -17,6 +17,7 @@ import javax.annotation.PreDestroy;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -37,7 +38,7 @@ public class JsonDataHolder {
     private JsonData getData() {
         List<Book> books = new ArrayList<>();
         List<Library> libraries = new ArrayList<>();
-        List<JsonBookLibrary> bookLibraryIds = new ArrayList<>();
+        List<JsonRelationID<UUID,UUID>> bookLibraryIds = new ArrayList<>();
         return new JsonData()
                 .setBooks(books)
                 .setLibraries(libraries)
