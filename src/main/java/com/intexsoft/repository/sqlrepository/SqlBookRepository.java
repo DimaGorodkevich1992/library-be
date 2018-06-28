@@ -11,23 +11,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implements BookRepository {
 
     private static final String SQL_SELECT_WITH_MAPPING =
             "SELECT " +
-                    "books.id AS book_id, " +
-                    "books.name AS book_name, " +
-                    "books.published AS book_published " +
-                    "books.author AS book_author, " +
-                    "books.number_pages AS book_number_pages, " +
-                    "books.version AS book_version, " +
-                    "libraries.id AS library_id, " +
-                    "libraries.name AS library_name, " +
-                    "libraries.address AS library_address " +
-                    "libraries.version AS library_version";
+                    "B.id AS book_id, " +
+                    "B.name AS book_name, " +
+                    "B.published AS book_published, " +
+                    "B.author AS book_author, " +
+                    "B.number_pages AS book_number_pages, " +
+                    "B.version AS book_version, " +
+                    "L.id AS library_id, " +
+                    "L.name AS library_name, " +
+                    "L.address AS library_address , " +
+                    "L.version AS library_version";
 
     @Override
     public UUID getGeneratedId(Book book) {
@@ -36,21 +35,28 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
 
     @Override
     public Book getByIdWithLibraries(UUID id) {
-        return getById(id,sqlGetByIdWithItems());
+        return getById(id, sqlGetByIdWithItems());
     }
 
     @Override
     protected String sqlGetByIdWithItems() {
         return SQL_SELECT_WITH_MAPPING + " " +
-                "FROM books, libraries " +
-                "INNER JOIN books_libraries AS B ON B.library_id = libraries.id " +
-                "WHERE books.id = :id";
+                "FROM  books AS B " +
+                "JOIN books_libraries AS BL ON B.id = BL.book_id " +
+                "JOIN libraries AS L ON L.id = BL.library_id " +
+                "WHERE B.id = :id";
     }
-
 
     @Override
     protected String sqlGetById() {
-        return "SELECT * FROM books WHERE id = :id";
+        return "SELECT " +
+                "B.id AS book_id, " +
+                "B.name AS book_name, " +
+                "B.published AS book_published, " +
+                "B.author AS book_author, " +
+                "B.number_pages AS book_number_pages, " +
+                "B.version AS book_version "+
+                "FROM books AS B  WHERE id = :id";
     }
 
     @Override
@@ -74,7 +80,6 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
         return "DELETE FROM books WHERE id = :id";
     }
 
-
     @Override
     protected MapSqlParameterSource getCommonParametersSource(Book book) {
         return super.getCommonParametersSource(book)
@@ -91,6 +96,5 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
         searchCriterias.put("author", author);
         return search(searchCriterias);
     }
-
 
 }

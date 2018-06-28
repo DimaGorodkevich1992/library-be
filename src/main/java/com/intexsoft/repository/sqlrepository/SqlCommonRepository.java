@@ -57,7 +57,10 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
 
     @Override
     public E getById(I id) {
-        return getById(id,sqlGetById());
+        return jdbcTemplate.query(sqlGetById(), new MapSqlParameterSource("id", id), mapper)
+                .stream()
+                .findFirst()
+                .orElse(null);
     }
 
     @Override

@@ -1,19 +1,24 @@
 package com.intexsoft.repository.sqlrepository.mapper;
 
 import com.intexsoft.model.Book;
+import com.intexsoft.model.BookLibrary;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
-
 @Component
+@ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlBookMapper extends CommonMapper<Book, UUID> {
 
     @Autowired
-    private SqlLibraryMapper libraryMapper;
+    private SqlBookLibraryMapper bookLibraryMapper;
 
     @Override
     protected Book getModel() {
@@ -23,21 +28,23 @@ public class SqlBookMapper extends CommonMapper<Book, UUID> {
     @Override
     public Book mapRow(ResultSet resultSet, int i) throws SQLException {
         Book book = super.mapRow(resultSet, i)
-                .setName(resultSet.getString("books_name"))
-                .setAuthor(resultSet.getString("author"))
-                .setPublished(resultSet.getDate("published"))
-                .setNumberPages(resultSet.getInt("number_pages"));
-                    return null;
+                .setName(resultSet.getString("book_name"))
+                .setAuthor(resultSet.getString("book_author"))
+                .setPublished(resultSet.getDate("book_published"))
+                .setNumberPages(resultSet.getInt("book_number_pages"));
+        Set<BookLibrary> libraries = new HashSet<>();
+        
+        return book;
     }
 
     @Override
     protected String getIdColumnName() {
-        return "books_id";
+        return "book_id";
     }
 
     @Override
     protected String getVersionColumn() {
-        return "books_version";
+        return "book_version";
     }
 
     @Override
