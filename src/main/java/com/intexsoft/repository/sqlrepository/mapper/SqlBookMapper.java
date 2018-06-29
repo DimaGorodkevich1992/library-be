@@ -27,13 +27,13 @@ public class SqlBookMapper extends CommonMapper<Book, UUID> {
 
     @Override
     public Book mapRow(ResultSet resultSet, int i) throws SQLException {
+        Set<BookLibrary> libraries = new HashSet<>();
         Book book = super.mapRow(resultSet, i)
                 .setName(resultSet.getString("book_name"))
                 .setAuthor(resultSet.getString("book_author"))
                 .setPublished(resultSet.getDate("book_published"))
                 .setNumberPages(resultSet.getInt("book_number_pages"));
-        Set<BookLibrary> libraries = new HashSet<>();
-        
+
         return book;
     }
 

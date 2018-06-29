@@ -59,6 +59,7 @@ public abstract class JpaCommonRepository<E extends CommonModel<I, E>, I extends
         return getById(id);
     }
 
+    @Transactional
     @Override
     public E update(E e) {
         em.merge(e);

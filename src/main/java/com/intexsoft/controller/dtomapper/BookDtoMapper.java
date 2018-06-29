@@ -16,6 +16,12 @@ public class BookDtoMapper extends AbstractDtoMapper<Book, BookDto, UUID> {
     }
 
     @Override
+    protected void instructionToEntity(BookDto dto, Book entity) {
+        super.instructionToEntity(dto, entity);
+        entity.setId(dto.getId());
+    }
+
+    @Override
     protected Class<Book> getEntityClass() {
         return Book.class;
     }
