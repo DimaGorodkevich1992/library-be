@@ -2,7 +2,7 @@ package com.intexsoft.repository.sqlrepository;
 
 import com.intexsoft.model.Library;
 import com.intexsoft.repository.LibraryRepository;
-import com.intexsoft.repository.sqlrepository.mapper.SqlLibraryMapper;
+import com.intexsoft.repository.sqlrepository.mapper.CommonMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
@@ -16,10 +16,8 @@ import java.util.UUID;
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlLibraryRepository extends SqlCommonRepository<Library, UUID> implements LibraryRepository {
 
-
-
-    public SqlLibraryRepository() {
-        super(new SqlLibraryMapper());
+    public SqlLibraryRepository(CommonMapper<Library, UUID> mapper) {
+        super(mapper);
     }
 
     private static final String SQL_SELECT_WITH_MAPPING =
@@ -37,7 +35,6 @@ public class SqlLibraryRepository extends SqlCommonRepository<Library, UUID> imp
 
     @Override
     public Library getByIdWithBooks(UUID id) {
-
         return null;
     }
 

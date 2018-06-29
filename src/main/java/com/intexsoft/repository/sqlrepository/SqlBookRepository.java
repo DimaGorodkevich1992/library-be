@@ -2,10 +2,10 @@ package com.intexsoft.repository.sqlrepository;
 
 import com.intexsoft.model.Book;
 import com.intexsoft.repository.BookRepository;
-import com.intexsoft.repository.sqlrepository.mapper.SqlBookLibraryMapper;
-import com.intexsoft.repository.sqlrepository.mapper.SqlBookMapper;
+import com.intexsoft.repository.sqlrepository.mapper.CommonMapper;
 import com.intexsoft.repository.sqlrepository.mapper.SqlBookMapperWithLibraryMapper;
-import com.intexsoft.repository.sqlrepository.mapper.SqlLibraryMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
@@ -16,9 +16,12 @@ import java.util.*;
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implements BookRepository {
 
-    public SqlBookRepository() {
-        super(new SqlBookMapper());
+    public SqlBookRepository(@Qualifier("sqlBookMapper") CommonMapper<Book, UUID> mapper) {
+        super(mapper);
     }
+
+    @Autowired
+    private SqlBookMapperWithLibraryMapper sqlBookMapperWithLibraryMapper;
 
     private static final String SQL_SELECT =
             "SELECT " +
@@ -44,8 +47,7 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
 
     @Override
     public Book getByIdWithLibraries(UUID id) {
-        return getById(id, sqlGetByIdWithItems(),
-                new SqlBookMapperWithLibraryMapper(new SqlBookLibraryMapper(new SqlBookMapper(), new SqlLibraryMapper()))).stream()
+        return getById(id, sqlGetByIdWithItems(), sqlBookMapperWithLibraryMapper).stream()
                 .reduce((book, book2) -> {
                     book.getLibraries().addAll(book2.getLibraries());
                     return book;

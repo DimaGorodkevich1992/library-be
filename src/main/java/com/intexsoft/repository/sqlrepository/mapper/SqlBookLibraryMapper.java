@@ -2,21 +2,22 @@ package com.intexsoft.repository.sqlrepository.mapper;
 
 import com.intexsoft.model.BookLibrary;
 import com.intexsoft.model.BookLibraryId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
+@Component
 public class SqlBookLibraryMapper extends CommonMapper<BookLibrary, BookLibraryId> {
 
+    @Autowired
+    @Qualifier("sqlBookMapper")
     private SqlBookMapper bookMapper;
-
+    @Autowired
     private SqlLibraryMapper libraryMapper;
-
-    public SqlBookLibraryMapper(SqlBookMapper bookMapper, SqlLibraryMapper libraryMapper) {
-        this.bookMapper = bookMapper;
-        this.libraryMapper = libraryMapper;
-    }
 
     @Override
     protected BookLibrary getModel() {

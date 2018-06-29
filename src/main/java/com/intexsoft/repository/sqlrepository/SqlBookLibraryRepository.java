@@ -4,20 +4,16 @@ import com.intexsoft.model.BookLibrary;
 import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.repository.BookLibraryRepository;
 import com.intexsoft.repository.sqlrepository.mapper.CommonMapper;
-import com.intexsoft.repository.sqlrepository.mapper.SqlBookLibraryMapper;
-import com.intexsoft.repository.sqlrepository.mapper.SqlBookMapper;
-import com.intexsoft.repository.sqlrepository.mapper.SqlLibraryMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlBookLibraryRepository extends SqlCommonRepository<BookLibrary, BookLibraryId> implements BookLibraryRepository {
 
-
-
-    public SqlBookLibraryRepository() {
-        super(new SqlBookLibraryMapper(new SqlBookMapper(),new SqlLibraryMapper()));
+    public SqlBookLibraryRepository(CommonMapper<BookLibrary, BookLibraryId> mapper) {
+        super(mapper);
     }
 
     @Override
@@ -32,7 +28,7 @@ public class SqlBookLibraryRepository extends SqlCommonRepository<BookLibrary, B
 
     @Override
     protected String sqlSave() {
-        return "INSERT INTO books_libraries (book_id, library_id, version) VALUES (:book_id, :libraries_id, :version)";
+        return "INSERT INTO books_libraries (book_id, library_id, version) VALUES (:book_id, :library_id, :version)";
     }
 
     @Override
@@ -48,5 +44,13 @@ public class SqlBookLibraryRepository extends SqlCommonRepository<BookLibrary, B
     @Override
     protected String sqlDelete() {
         return null;
+    }
+
+    @Override
+    protected MapSqlParameterSource getCommonParametersSource(BookLibrary bookLibrary) {
+        return new MapSqlParameterSource()
+                .addValue("version", bookLibrary.getVersion())
+                .addValue("book_id", bookLibrary.getId().getBookId())
+                .addValue("library_id", bookLibrary.getId().getLibraryId());
     }
 }
