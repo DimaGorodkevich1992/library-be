@@ -2,31 +2,40 @@ package com.intexsoft.repository.sqlrepository;
 
 import com.intexsoft.model.Book;
 import com.intexsoft.repository.BookRepository;
+import com.intexsoft.repository.sqlrepository.mapper.SqlBookLibraryMapper;
+import com.intexsoft.repository.sqlrepository.mapper.SqlBookMapper;
+import com.intexsoft.repository.sqlrepository.mapper.SqlBookMapperWithLibraryMapper;
+import com.intexsoft.repository.sqlrepository.mapper.SqlLibraryMapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implements BookRepository {
 
-    private static final String SQL_SELECT_WITH_MAPPING =
+    public SqlBookRepository() {
+        super(new SqlBookMapper());
+    }
+
+    private static final String SQL_SELECT =
             "SELECT " +
                     "B.id AS book_id, " +
                     "B.name AS book_name, " +
                     "B.published AS book_published, " +
                     "B.author AS book_author, " +
                     "B.number_pages AS book_number_pages, " +
-                    "B.version AS book_version, " +
+                    "B.version AS book_version ";
+
+    private static final String SQL_SELECT_WITH_MAPPING =
+            SQL_SELECT + ", " +
                     "L.id AS library_id, " +
                     "L.name AS library_name, " +
                     "L.address AS library_address , " +
-                    "L.version AS library_version";
+                    "L.version AS library_version, " +
+                    "BL.version AS book_library_version ";
 
     @Override
     public UUID getGeneratedId(Book book) {
@@ -35,7 +44,13 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
 
     @Override
     public Book getByIdWithLibraries(UUID id) {
-        return getById(id, sqlGetByIdWithItems());
+        return getById(id, sqlGetByIdWithItems(),
+                new SqlBookMapperWithLibraryMapper(new SqlBookLibraryMapper(new SqlBookMapper(), new SqlLibraryMapper()))).stream()
+                .reduce((book, book2) -> {
+                    book.getLibraries().addAll(book2.getLibraries());
+                    return book;
+                })
+                .orElse(getById(id).setLibraries(Collections.emptySet()));
     }
 
     @Override
@@ -49,13 +64,7 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
 
     @Override
     protected String sqlGetById() {
-        return "SELECT " +
-                "B.id AS book_id, " +
-                "B.name AS book_name, " +
-                "B.published AS book_published, " +
-                "B.author AS book_author, " +
-                "B.number_pages AS book_number_pages, " +
-                "B.version AS book_version "+
+        return SQL_SELECT + " " +
                 "FROM books AS B  WHERE id = :id";
     }
 
@@ -66,13 +75,14 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
 
     @Override
     protected String sqlSearch() {
-        return SQL_SELECT_WITH_MAPPING + " " +
-                "FROM books INNER JOIN libraries ON (books.libraries_id = libraries.id) WHERE books.name = COALESCE(:name,books.name) and author = COALESCE(:author,author)";
+        return SQL_SELECT + " " +
+                "FROM books AS B " +
+                "WHERE B.name = COALESCE(:name,B.name) and B.author = COALESCE(:author,B.author)";
     }
 
     @Override
     protected String sqlUpdate() {
-        return "UPDATE books SET id = :id, name = :name, published = :published, author = :author, number_pages = :number_pages, version = :version, library_id = library_id WHERE id = :id";
+        return "UPDATE books SET id = :id, name = :name, published = :published, author = :author, number_pages = :number_pages, version = :version WHERE id = :id";
     }
 
     @Override

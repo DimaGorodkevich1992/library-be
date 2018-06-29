@@ -5,6 +5,7 @@ import com.intexsoft.repository.CommonRepository;
 import com.intexsoft.repository.sqlrepository.mapper.CommonMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -17,8 +18,11 @@ import java.util.Map;
 @Slf4j
 public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends Serializable> implements CommonRepository<E, I> {
 
-    @Autowired
     private CommonMapper<E, I> mapper;
+
+    public SqlCommonRepository(CommonMapper<E, I> mapper) {
+        this.mapper = mapper;
+    }
 
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
@@ -35,7 +39,6 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
 
     protected abstract String sqlDelete();
 
-
     protected MapSqlParameterSource getCommonParametersSource(E e) {
         MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
         mapSqlParameterSource.addValue("id", e.getId());
@@ -48,11 +51,9 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
         return e.getId();
     }
 
-    public E getById(I id, String sql) {
-        return jdbcTemplate.query(sql, new MapSqlParameterSource("id", id), mapper)
-                .stream()
-                .findFirst()
-                .orElse(null);
+    public List<E> getById(I id, String sql, RowMapper<E> rowMapper) {
+        return jdbcTemplate.query(sql, new MapSqlParameterSource("id", id), rowMapper);
+
     }
 
     @Override
@@ -65,6 +66,8 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
 
     @Override
     public E save(E e) {
+        e.setId(getGeneratedId(e))
+                .setVersion(1);
         jdbcTemplate.update(sqlSave(), getCommonParametersSource(e));
         return getById(e.getId());
     }
@@ -92,9 +95,6 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
         }
         return var;
     }
-
-
-
 
     @Override
     public void deleteById(I id) {

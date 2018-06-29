@@ -2,21 +2,21 @@ package com.intexsoft.repository.sqlrepository.mapper;
 
 import com.intexsoft.model.BookLibrary;
 import com.intexsoft.model.BookLibraryId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
-@Component
-@ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlBookLibraryMapper extends CommonMapper<BookLibrary, BookLibraryId> {
 
-    @Autowired
     private SqlBookMapper bookMapper;
-    @Autowired
+
     private SqlLibraryMapper libraryMapper;
+
+    public SqlBookLibraryMapper(SqlBookMapper bookMapper, SqlLibraryMapper libraryMapper) {
+        this.bookMapper = bookMapper;
+        this.libraryMapper = libraryMapper;
+    }
 
     @Override
     protected BookLibrary getModel() {
@@ -25,21 +25,27 @@ public class SqlBookLibraryMapper extends CommonMapper<BookLibrary, BookLibraryI
 
     @Override
     public BookLibrary mapRow(ResultSet resultSet, int i) throws SQLException {
-        return super.mapRow(resultSet, i);
+        return new BookLibrary()
+                .setId(new BookLibraryId()
+                        .setBookId(UUID.fromString(resultSet.getString("book_id")))
+                        .setLibraryId(UUID.fromString(resultSet.getString("library_id"))))
+                .setBook(bookMapper.mapRow(resultSet, i))
+                .setLibrary(libraryMapper.mapRow(resultSet, i))
+                .setVersion(resultSet.getLong("book_library_version"));
     }
 
     @Override
     protected String getIdColumnName() {
-        return null;
+        return "book_id";
     }
 
     @Override
     protected String getVersionColumn() {
-        return null;
+        return "book_library_id";
     }
 
     @Override
     protected BookLibraryId convertedId(String string) {
-        return null;
+        return new BookLibraryId();
     }
 }

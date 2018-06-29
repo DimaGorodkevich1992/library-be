@@ -1,20 +1,13 @@
 package com.intexsoft.repository.sqlrepository.mapper;
 
 import com.intexsoft.model.Library;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-@Component
-@ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
-public class SqlLibraryMapper extends CommonMapper<Library, UUID> {
 
-    @Autowired
-    private SqlBookLibraryMapper bookLibraryMapper;
+public class SqlLibraryMapper extends CommonMapper<Library, UUID> {
 
     @Override
     public Library mapRow(ResultSet resultSet, int i) throws SQLException {
