@@ -35,7 +35,7 @@ public abstract class CommonController {
 
     protected final <T> DeferredResult<T> getDeferredResult(long timeout) {
         DeferredResult<T> result = new DeferredResult<>(timeout);
-        result.onTimeout(() -> result.setErrorResult(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(TIME_ERROR)));
+        result.onTimeout(() -> result.setErrorResult(status(HttpStatus.INTERNAL_SERVER_ERROR).body(TIME_ERROR)));
         return result;
     }
 

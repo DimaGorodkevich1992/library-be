@@ -10,18 +10,22 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.BinaryOperator;
 
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlLibraryRepository extends SqlCommonRepository<Library, UUID> implements LibraryRepository {
 
+    @Autowired
+    private SqlLibraryWithBooksMapper sqlLibraryWithBooksMapper;
+
     public SqlLibraryRepository(@Qualifier("sqlLibraryMapper") CommonMapper<Library, UUID> mapper) {
         super(mapper);
     }
-
-    @Autowired
-    private SqlLibraryWithBooksMapper sqlLibraryWithBooksMapper;
 
     @Override
     public UUID getGeneratedId(Library library) {
@@ -45,12 +49,11 @@ public class SqlLibraryRepository extends SqlCommonRepository<Library, UUID> imp
                     "B.version AS book_version," +
                     "BL.version AS book_library_version";
 
-    @Override
-    protected String sqlGetByIdWithItems() {
+    private String sqlGetByIdWithBooks() {
         return SQL_SELECT_WITH_MAPPING + " " +
                 "FROM libraries AS L " +
-                "JOIN books_libraries AS BL ON L.id = BL.library_id " +
-                "JOIN books AS B ON B.id = BL.book_id " +
+                "LEFT JOIN books_libraries AS BL ON L.id = BL.library_id " +
+                "LEFT JOIN books AS B ON B.id = BL.book_id " +
                 "WHERE L.id = :id";
     }
 
@@ -85,7 +88,11 @@ public class SqlLibraryRepository extends SqlCommonRepository<Library, UUID> imp
 
     @Override
     public Library getByIdWithBooks(UUID id) {
-        return getById(id, sqlLibraryWithBooksMapper);
+        BinaryOperator<Library> reducedLibraries = (library, library2) -> {
+            library.getBooks().addAll(library2.getBooks());
+            return library;
+        };
+        return getByIdWithJoins(id, sqlGetByIdWithBooks(), sqlLibraryWithBooksMapper, reducedLibraries);
     }
 
     @Override

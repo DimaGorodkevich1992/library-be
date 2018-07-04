@@ -6,6 +6,7 @@ import com.intexsoft.model.BookLibrary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -19,10 +20,13 @@ public class BookDtoMapperWithLibraries extends AbstractDtoMapper<Book, BookDtoW
     protected void instructionToDto(Book entity, BookDtoWithLibraries dto) {
         super.instructionToDto(entity, dto);
         dto.setInfo(entity.getAuthor() + "-" + entity.getName());
-        dto.setLibraries(entity.getLibraries().stream()
+        dto.setLibraries(entity.getLibraries().isEmpty()
+                ? Collections.emptySet()
+                : entity.getLibraries().stream()
                 .map(BookLibrary::getLibrary)
                 .map(libraryDtoMapper::toDto)
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toSet()))
+        ;
     }
 
     @Override

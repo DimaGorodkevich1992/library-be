@@ -6,6 +6,7 @@ import com.intexsoft.model.Library;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -18,7 +19,9 @@ public class LibraryDtoMapperWithBooks extends AbstractDtoMapper<Library, Librar
     @Override
     protected void instructionToDto(Library entity, LibraryDtoWithBooks dto) {
         super.instructionToDto(entity, dto);
-        dto.setBooks(entity.getBooks().stream()
+        dto.setBooks(entity.getBooks().isEmpty()
+                ? Collections.emptySet()
+                : entity.getBooks().stream()
                 .map(BookLibrary::getBook)
                 .map(bookDtoMapper::toDto)
                 .collect(Collectors.toSet()));

@@ -19,10 +19,9 @@ public abstract class CommonMapper<E extends CommonModel<I, E>, I extends Serial
 
     @Override
     public E mapRow(ResultSet resultSet, int i) throws SQLException {
-        E e = getModel();
-        e.setId(convertedId(resultSet.getString(getIdColumnName())));
-        e.setVersion(resultSet.getLong(getVersionColumn()));
-        return e;
+        return getModel()
+                .setId(convertedId(resultSet.getString(getIdColumnName())))
+                .setVersion(resultSet.getLong(getVersionColumn()));
     }
 }
 

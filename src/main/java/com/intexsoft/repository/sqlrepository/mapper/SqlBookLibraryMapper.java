@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
@@ -29,13 +30,20 @@ public class SqlBookLibraryMapper extends CommonMapper<BookLibrary, BookLibraryI
 
     @Override
     public BookLibrary mapRow(ResultSet resultSet, int i) throws SQLException {
-        return new BookLibrary()
-                .setId(new BookLibraryId()
-                        .setBookId(UUID.fromString(resultSet.getString("book_id")))
-                        .setLibraryId(UUID.fromString(resultSet.getString("library_id"))))
-                .setBook(bookMapper.mapRow(resultSet, i))
-                .setLibrary(libraryMapper.mapRow(resultSet, i))
-                .setVersion(resultSet.getLong("book_library_version"));
+        if (Objects.isNull(resultSet.getString("book_id"))
+                || Objects.isNull(resultSet.getString("library_id"))) {
+            return null;
+        } else {
+            return new BookLibrary()
+                    .setId(new BookLibraryId()
+                            .setBookId(UUID.fromString(resultSet.getString("book_id")))
+                            .setLibraryId(UUID.fromString(resultSet.getString("library_id"))))
+                    .setBook(bookMapper.mapRow(resultSet, i))
+                    .setLibrary(libraryMapper.mapRow(resultSet, i))
+                    .setVersion(resultSet.getLong("book_library_version"));
+
+        }
+
     }
 
     @Override

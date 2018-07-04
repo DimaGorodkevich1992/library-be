@@ -10,28 +10,26 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.BinaryOperator;
 
 @Component
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implements BookRepository {
 
+    @Autowired
+    private SqlBookWithLibrariesMapper sqlBookWithLibrariesMapper;
+
     public SqlBookRepository(@Qualifier("sqlBookMapper") CommonMapper<Book, UUID> mapper) {
         super(mapper);
     }
 
-    @Autowired
-    private SqlBookWithLibrariesMapper sqlBookWithLibrariesMapper;
-
     @Override
     public UUID getGeneratedId(Book book) {
         return UUID.randomUUID();
-    }
-
-    @Override
-    protected Book getReducedEntity(Book left, Book right) {
-        left.getLibraries().addAll(right.getLibraries());
-        return left;
     }
 
     private static final String SQL_SELECT =
@@ -51,12 +49,11 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
                     "L.version AS library_version, " +
                     "BL.version AS book_library_version ";
 
-    @Override
-    protected String sqlGetByIdWithItems() {
+    private String sqlGetByIdWithLibraries() {
         return SQL_SELECT_WITH_MAPPING + " " +
                 "FROM  books AS B " +
-                "JOIN books_libraries AS BL ON B.id = BL.book_id " +
-                "JOIN libraries AS L ON L.id = BL.library_id " +
+                "LEFT JOIN books_libraries AS BL ON B.id = BL.book_id " +
+                "LEFT JOIN libraries AS L ON L.id = BL.library_id " +
                 "WHERE B.id = :id";
     }
 
@@ -90,7 +87,11 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
 
     @Override
     public Book getByIdWithLibraries(UUID id) {
-        return getById(id,sqlBookWithLibrariesMapper);
+        BinaryOperator<Book> reducedBooks = (book, book2) -> {
+            book.getLibraries().addAll(book2.getLibraries());
+            return book;
+        };
+        return getByIdWithJoins(id, sqlGetByIdWithLibraries(), sqlBookWithLibrariesMapper, reducedBooks);
     }
 
     @Override

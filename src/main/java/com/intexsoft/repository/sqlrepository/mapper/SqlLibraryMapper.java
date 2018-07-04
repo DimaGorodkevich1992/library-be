@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
@@ -36,7 +37,7 @@ public class SqlLibraryMapper extends CommonMapper<Library, UUID> {
 
     @Override
     protected UUID convertedId(String string) {
-        return UUID.fromString(string);
+        return Objects.equals(string, null) ? null : UUID.fromString(string);
     }
 
 }

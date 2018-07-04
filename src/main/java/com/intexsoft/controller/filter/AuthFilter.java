@@ -1,21 +1,18 @@
 package com.intexsoft.controller.filter;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Component
 public class AuthFilter implements Filter {
 
-    @Value("${application.api.key}")
-    private String apiKey = "1234";
+
+    private String apiKey;
 
     @Override
     public void init(FilterConfig filterConfig) {
+        apiKey = filterConfig.getInitParameter("apiKey");
     }
 
     @Override

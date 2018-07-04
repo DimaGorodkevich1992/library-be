@@ -2,6 +2,7 @@ package com.intexsoft.config;
 
 import com.intexsoft.controller.filter.AuthFilter;
 import com.intexsoft.controller.filter.BookFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,10 +12,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class AppConfig {
 
+    @Value("${application.api.key}")
+    private String apiKey;
+
     @Bean
     public FilterRegistrationBean<AuthFilter> authFilter() {
         FilterRegistrationBean<AuthFilter> filter = new FilterRegistrationBean<>();
         filter.setFilter(new AuthFilter());
+        filter.addInitParameter("apiKey", apiKey);
         filter.addUrlPatterns("/api/*");
         return filter;
     }

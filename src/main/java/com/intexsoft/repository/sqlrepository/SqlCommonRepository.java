@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BinaryOperator;
 
 @Slf4j
 public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends Serializable> implements CommonRepository<E, I> {
@@ -26,8 +27,6 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
 
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
-
-    protected abstract String sqlGetByIdWithItems();
 
     protected abstract String sqlGetById();
 
@@ -46,20 +45,16 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
         return mapSqlParameterSource;
     }
 
-    protected E getReducedEntity(E left, E right) {
-        return null;
-    }
-
     @Override
     public I getGeneratedId(E e) {
         return e.getId();
     }
 
-    public E getById(I id, RowMapper<E> rowMapper) {
-        return jdbcTemplate.query(sqlGetByIdWithItems(), new MapSqlParameterSource("id", id), rowMapper)
+    protected E getByIdWithJoins(I id, String sqlQuery, RowMapper<E> rowMapper, BinaryOperator<E> reduceOperator) {
+        return jdbcTemplate.query(sqlQuery, new MapSqlParameterSource("id", id), rowMapper)
                 .stream()
-                .reduce(this::getReducedEntity)
-                .orElseGet(() -> getById(id));
+                .reduce(reduceOperator)
+                .orElse(null);
 
     }
 

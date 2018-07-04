@@ -14,16 +14,11 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlBookLibraryRepository extends SqlCommonRepository<BookLibrary, BookLibraryId> implements BookLibraryRepository {
 
-    public SqlBookLibraryRepository(CommonMapper<BookLibrary, BookLibraryId> mapper) {
-        super(mapper);
-    }
-
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
 
-    @Override
-    protected String sqlGetByIdWithItems() {
-        return null;
+    public SqlBookLibraryRepository(CommonMapper<BookLibrary, BookLibraryId> mapper) {
+        super(mapper);
     }
 
     @Override
