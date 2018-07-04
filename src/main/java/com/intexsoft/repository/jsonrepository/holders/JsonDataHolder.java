@@ -38,7 +38,7 @@ public class JsonDataHolder {
     private JsonData getData() {
         List<Book> books = new ArrayList<>();
         List<Library> libraries = new ArrayList<>();
-        List<JsonRelationID<UUID,UUID>> bookLibraryIds = new ArrayList<>();
+        List<JsonRelationID<UUID, UUID>> bookLibraryIds = new ArrayList<>();
         return new JsonData()
                 .setBooks(books)
                 .setLibraries(libraries)

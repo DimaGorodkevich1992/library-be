@@ -1,14 +1,15 @@
 package com.intexsoft.repository.sqlrepository.mapper;
 
 import com.intexsoft.model.Book;
-import org.springframework.context.annotation.Primary;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
+
 @Component
-@Primary
+@ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlBookMapper extends CommonMapper<Book, UUID> {
 
     @Override

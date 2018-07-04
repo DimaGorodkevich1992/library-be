@@ -1,6 +1,5 @@
 package com.intexsoft.controller;
 
-import com.intexsoft.controller.dtomapper.BookDtoMapper;
 import com.intexsoft.controller.dtomapper.LibraryDtoMapper;
 import com.intexsoft.controller.dtomapper.LibraryDtoMapperWithBooks;
 import com.intexsoft.dto.LibraryDto;
@@ -29,8 +28,6 @@ public class LibraryController extends CommonController {
     private LibraryDtoMapper libraryDtoMapper;
     @Autowired
     private LibraryDtoMapperWithBooks libraryDtoMapperWithBooks;
-    @Autowired
-    private BookDtoMapper bookDtoMapper;
 
     @ApiOperation(value = "store library", notes = "Store new library in database", response = LibraryDto.class)
     @PostMapping()

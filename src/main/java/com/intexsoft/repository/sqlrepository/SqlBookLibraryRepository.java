@@ -4,8 +4,10 @@ import com.intexsoft.model.BookLibrary;
 import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.repository.BookLibraryRepository;
 import com.intexsoft.repository.sqlrepository.mapper.CommonMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,6 +17,9 @@ public class SqlBookLibraryRepository extends SqlCommonRepository<BookLibrary, B
     public SqlBookLibraryRepository(CommonMapper<BookLibrary, BookLibraryId> mapper) {
         super(mapper);
     }
+
+    @Autowired
+    private NamedParameterJdbcTemplate jdbcTemplate;
 
     @Override
     protected String sqlGetByIdWithItems() {
@@ -44,6 +49,12 @@ public class SqlBookLibraryRepository extends SqlCommonRepository<BookLibrary, B
     @Override
     protected String sqlDelete() {
         return null;
+    }
+
+    @Override
+    public BookLibrary save(BookLibrary bookLibrary) {
+        jdbcTemplate.update(sqlSave(), getCommonParametersSource(bookLibrary));
+        return bookLibrary;
     }
 
     @Override

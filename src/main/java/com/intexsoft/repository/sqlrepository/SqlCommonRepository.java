@@ -20,7 +20,7 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
 
     private CommonMapper<E, I> mapper;
 
-    public SqlCommonRepository(CommonMapper<E, I> mapper) {
+    SqlCommonRepository(CommonMapper<E, I> mapper) {
         this.mapper = mapper;
     }
 
@@ -46,13 +46,20 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
         return mapSqlParameterSource;
     }
 
+    protected E getReducedEntity(E left, E right) {
+        return null;
+    }
+
     @Override
     public I getGeneratedId(E e) {
         return e.getId();
     }
 
-    public List<E> getById(I id, String sql, RowMapper<E> rowMapper) {
-        return jdbcTemplate.query(sql, new MapSqlParameterSource("id", id), rowMapper);
+    public E getById(I id, RowMapper<E> rowMapper) {
+        return jdbcTemplate.query(sqlGetByIdWithItems(), new MapSqlParameterSource("id", id), rowMapper)
+                .stream()
+                .reduce(this::getReducedEntity)
+                .orElseGet(() -> getById(id));
 
     }
 

@@ -3,14 +3,18 @@ package com.intexsoft.repository.sqlrepository.mapper;
 import com.intexsoft.model.Book;
 import com.intexsoft.model.BookLibrary;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
+
 @Component
-public class SqlBookMapperWithLibraryMapper extends SqlBookMapper {
+@ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
+public class SqlBookWithLibrariesMapper extends SqlBookMapper {
+
     @Autowired
     private SqlBookLibraryMapper bookLibraryMapper;
 

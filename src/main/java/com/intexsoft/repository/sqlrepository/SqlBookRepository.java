@@ -3,7 +3,7 @@ package com.intexsoft.repository.sqlrepository;
 import com.intexsoft.model.Book;
 import com.intexsoft.repository.BookRepository;
 import com.intexsoft.repository.sqlrepository.mapper.CommonMapper;
-import com.intexsoft.repository.sqlrepository.mapper.SqlBookMapperWithLibraryMapper;
+import com.intexsoft.repository.sqlrepository.mapper.SqlBookWithLibrariesMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -21,7 +21,18 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
     }
 
     @Autowired
-    private SqlBookMapperWithLibraryMapper sqlBookMapperWithLibraryMapper;
+    private SqlBookWithLibrariesMapper sqlBookWithLibrariesMapper;
+
+    @Override
+    public UUID getGeneratedId(Book book) {
+        return UUID.randomUUID();
+    }
+
+    @Override
+    protected Book getReducedEntity(Book left, Book right) {
+        left.getLibraries().addAll(right.getLibraries());
+        return left;
+    }
 
     private static final String SQL_SELECT =
             "SELECT " +
@@ -39,21 +50,6 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
                     "L.address AS library_address , " +
                     "L.version AS library_version, " +
                     "BL.version AS book_library_version ";
-
-    @Override
-    public UUID getGeneratedId(Book book) {
-        return UUID.randomUUID();
-    }
-
-    @Override
-    public Book getByIdWithLibraries(UUID id) {
-        return getById(id, sqlGetByIdWithItems(), sqlBookMapperWithLibraryMapper).stream()
-                .reduce((book, book2) -> {
-                    book.getLibraries().addAll(book2.getLibraries());
-                    return book;
-                })
-                .orElse(getById(id).setLibraries(Collections.emptySet()));
-    }
 
     @Override
     protected String sqlGetByIdWithItems() {
@@ -90,6 +86,11 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
     @Override
     protected String sqlDelete() {
         return "DELETE FROM books WHERE id = :id";
+    }
+
+    @Override
+    public Book getByIdWithLibraries(UUID id) {
+        return getById(id,sqlBookWithLibrariesMapper);
     }
 
     @Override

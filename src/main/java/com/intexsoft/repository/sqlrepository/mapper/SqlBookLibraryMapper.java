@@ -4,6 +4,7 @@ import com.intexsoft.model.BookLibrary;
 import com.intexsoft.model.BookLibraryId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
@@ -11,12 +12,14 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 @Component
+@ConditionalOnProperty(name = "datasource.name", havingValue = "dbSql")
 public class SqlBookLibraryMapper extends CommonMapper<BookLibrary, BookLibraryId> {
 
     @Autowired
     @Qualifier("sqlBookMapper")
     private SqlBookMapper bookMapper;
     @Autowired
+    @Qualifier("sqlLibraryMapper")
     private SqlLibraryMapper libraryMapper;
 
     @Override

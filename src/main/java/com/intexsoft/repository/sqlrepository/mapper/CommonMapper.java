@@ -9,7 +9,6 @@ import java.sql.SQLException;
 
 public abstract class CommonMapper<E extends CommonModel<I, E>, I extends Serializable> implements RowMapper<E> {
 
-
     protected abstract E getModel();
 
     protected abstract String getIdColumnName();
