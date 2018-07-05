@@ -16,6 +16,8 @@ import java.util.UUID;
 @Service
 public class BookService extends CommonService<Book, UUID> {
 
+
+
     @Autowired
     private BookLibraryRepository bookLibraryRepository;
 
