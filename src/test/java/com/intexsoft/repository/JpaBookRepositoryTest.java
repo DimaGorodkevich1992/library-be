@@ -85,8 +85,8 @@ public class JpaBookRepositoryTest  {
         book.setName("name2");
         book.setId(id3);
         jpaBookRepositoryTest.save(book);
-        Book wantedBook = jpaBookRepositoryTest.getById(id3);
-        assertEquals(book, jpaBookRepositoryTest.getById(id3));
+        Book wantedBook = jpaBookRepositoryTest.getByIdWithJoins(id3);
+        assertEquals(book, jpaBookRepositoryTest.getByIdWithJoins(id3));
         jpaBookRepositoryTest.deleteById(id3);
     }
    
@@ -98,13 +98,13 @@ public class JpaBookRepositoryTest  {
 
     @Test
     public void getByIdCaseCorrectId() {
-        Book wantedBook = jpaBookRepositoryTest.getById(id);
+        Book wantedBook = jpaBookRepositoryTest.getByIdWithJoins(id);
         assertEquals(getBook(), wantedBook);
     }
 
     @Test
     public void getByIdCaseIncorrectId() {
-       assertNull(jpaBookRepositoryTest.getById(wrongId));
+       assertNull(jpaBookRepositoryTest.getByIdWithJoins(wrongId));
 
     }
 
@@ -114,7 +114,7 @@ public class JpaBookRepositoryTest  {
         BeanUtils.copyProperties(getBook(), book);
         book.setAuthor("tolkien");
         jpaBookRepositoryTest.update(book);
-        assertEquals(2, jpaBookRepositoryTest.getById(id).getVersion());
+        assertEquals(2, jpaBookRepositoryTest.getByIdWithJoins(id).getVersion());
     }
 
     @Test(expected = StaleObjectStateException.class)
@@ -158,7 +158,7 @@ public class JpaBookRepositoryTest  {
         book.setId(id3);
         jpaBookRepositoryTest.save(book);
         jpaBookRepositoryTest.deleteById(id3);
-        jpaBookRepositoryTest.getById(id3);
+        jpaBookRepositoryTest.getByIdWithJoins(id3);
     }
 
 

@@ -21,12 +21,12 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
 
     private CommonMapper<E, I> mapper;
 
-    SqlCommonRepository(CommonMapper<E, I> mapper) {
-        this.mapper = mapper;
-    }
-
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
+
+    public SqlCommonRepository(CommonMapper<E, I> mapper) {
+        this.mapper = mapper;
+    }
 
     protected abstract String sqlGetById();
 

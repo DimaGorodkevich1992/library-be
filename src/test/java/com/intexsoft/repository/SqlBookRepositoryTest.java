@@ -82,7 +82,7 @@ public class SqlBookRepositoryTest {
         book.setName("name2");
         book.setId(id3);
         sqlBookRepositoryTest.save(book);
-        assertEquals(book, sqlBookRepositoryTest.getById(id3));
+        assertEquals(book, sqlBookRepositoryTest.getByIdWithJoins(id3));
         sqlBookRepositoryTest.deleteById(id3);
     }
 
@@ -93,13 +93,13 @@ public class SqlBookRepositoryTest {
 
     @Test
     public void getByIdCaseCorrectId() {
-        Book wantedBook = sqlBookRepositoryTest.getById(id);
+        Book wantedBook = sqlBookRepositoryTest.getByIdWithJoins(id);
         assertEquals(getBook(), wantedBook);
     }
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void getByIdCaseIncorrectId() {
-        sqlBookRepositoryTest.getById(wrongId);
+        sqlBookRepositoryTest.getByIdWithJoins(wrongId);
 
     }
 
@@ -109,7 +109,7 @@ public class SqlBookRepositoryTest {
         BeanUtils.copyProperties(getBook(), book);
         book.setAuthor("tolkien");
         sqlBookRepositoryTest.update(book);
-        assertEquals(2, sqlBookRepositoryTest.getById(id).getVersion());
+        assertEquals(2, sqlBookRepositoryTest.getByIdWithJoins(id).getVersion());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -153,6 +153,6 @@ public class SqlBookRepositoryTest {
         book.setId(id3);
         sqlBookRepositoryTest.save(book);
         sqlBookRepositoryTest.deleteById(id3);
-        sqlBookRepositoryTest.getById(id3);
+        sqlBookRepositoryTest.getByIdWithJoins(id3);
     }
 }*/
