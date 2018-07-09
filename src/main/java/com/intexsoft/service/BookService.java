@@ -10,13 +10,14 @@ import org.springframework.stereotype.Service;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 @Service
 public class BookService extends CommonService<Book, UUID> {
 
-
+    private static final String CACHE_ID_WITH_ITEMS = "books";
 
     @Autowired
     private BookLibraryRepository bookLibraryRepository;
@@ -24,16 +25,31 @@ public class BookService extends CommonService<Book, UUID> {
     @Autowired
     private BookRepository bookRepository;
 
+    @Override
+    protected List<String> getListKeyToDeleteItems(List<String> cacheIdForItems) {
+        cacheIdForItems.add(CACHE_ID_WITH_ITEMS);
+        return super.getListKeyToDeleteItems(cacheIdForItems);
+    }
+
+    @Override
+    protected String commonCacheId() {
+        return "booksCommon";
+    }
+
     public Observable<Book> searchBook(String name, String author) {
-        return Observable.fromCallable(() -> Observable.from(bookRepository.searchBook(name, author)))
+        return Observable.fromCallable(() -> isExistCAcheAndGetResultWithItemsList
+                (CACHE_ID_WITH_ITEMS, name + author, bookRepository.searchBook(name, author)))
+                .doOnNext(v -> isExistAndSubmitCacheWithItemsList(CACHE_ID_WITH_ITEMS, name + author, v))
+                .map(Observable::from)
                 .compose(Observable::merge)
                 .subscribeOn(Schedulers.io());
     }
 
     public Observable<Book> getByIdWithLibrary(UUID id) {
         return Observable.just(id)
-                .map(bookRepository::getByIdWithLibraries)
+                .map(s -> isExistCacheAndGetResult(CACHE_ID_WITH_ITEMS, s, bookRepository.getByIdWithLibraries(s)))
                 .filter(Objects::nonNull)
+                .doOnNext(s -> isExistAndSubmitCache(CACHE_ID_WITH_ITEMS, s))
                 .subscribeOn(Schedulers.io());
     }
 
@@ -43,6 +59,7 @@ public class BookService extends CommonService<Book, UUID> {
                         .setBookId(bookId)
                         .setLibraryId(libraryId))))
                 .map(bl -> bookRepository.getByIdWithLibraries(bl.getId().getBookId()))
+                .doOnNext(v -> hashOperations.put(CACHE_ID_WITH_ITEMS, bookId, v))
                 .subscribeOn(Schedulers.io());
     }
 

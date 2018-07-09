@@ -25,8 +25,7 @@ public class BookDtoMapperWithLibraries extends AbstractDtoMapper<Book, BookDtoW
                 : entity.getLibraries().stream()
                 .map(BookLibrary::getLibrary)
                 .map(libraryDtoMapper::toDto)
-                .collect(Collectors.toSet()))
-        ;
+                .collect(Collectors.toSet()));
     }
 
     @Override

@@ -10,8 +10,9 @@ import java.io.Serializable;
 @Data
 @Accessors(chain = true)
 @MappedSuperclass
-public abstract class CommonModel<I extends Serializable, T extends CommonModel<I, T>> {
+public abstract class CommonModel<I extends Serializable, T extends CommonModel<I, T>> implements Serializable {
 
+    private static final long serialVersionUID = 2176697081036209181L;
     @Version
     private long version;
 

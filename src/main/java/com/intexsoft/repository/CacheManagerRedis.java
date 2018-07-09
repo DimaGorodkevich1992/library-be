@@ -1,4 +1,5 @@
-/*package com.intexsoft.repository;
+/*
+package com.intexsoft.repository;
 
 import com.intexsoft.model.CommonModel;
 import org.springframework.beans.factory.InitializingBean;
@@ -11,7 +12,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Component
-public class CacheManagerRedis<E extends CommonModel<I, E>, I extends Serializable> implements InitializingBean {
+public class CacheManagerRedis<E extends CommonModel<I, E>, I extends Serializable> {
 
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
@@ -38,8 +39,5 @@ public class CacheManagerRedis<E extends CommonModel<I, E>, I extends Serializab
         return false;
     }
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        System.out.println("");
-    }
-}*/
+}
+*/

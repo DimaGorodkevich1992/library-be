@@ -1,11 +1,11 @@
 package com.intexsoft.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,7 +16,9 @@ import java.util.UUID;
 @Accessors(chain = true)
 @Entity
 @Table(name = "books")
-public class Book extends CommonModel<UUID, Book> {
+public class Book extends CommonModel<UUID, Book> implements Serializable {
+
+    private static final long serialVersionUID = -4037997523824934833L;
 
     @Id
     @Column(name = "id")
@@ -26,7 +28,6 @@ public class Book extends CommonModel<UUID, Book> {
     private String author;
     @Column(name = "number_pages")
     private Integer numberPages;
-    @JsonIgnore
     @OneToMany(mappedBy = "book")
     private Set<BookLibrary> libraries = new HashSet<>();
 
