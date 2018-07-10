@@ -19,7 +19,7 @@ public abstract class CommonController {
 
     private static final String TIME_ERROR = "Response time exceeded";
 
-    private static final long TIMEOUT = 5000;
+    private static final long TIMEOUT = 60000;
 
     @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity<String> acceptIllegalArgumentException(IllegalArgumentException ex) {

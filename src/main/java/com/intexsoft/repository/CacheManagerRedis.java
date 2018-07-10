@@ -1,27 +1,29 @@
-/*
 package com.intexsoft.repository;
 
 import com.intexsoft.model.CommonModel;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.UUID;
+import java.util.Collection;
 
 @Component
-public class CacheManagerRedis<E extends CommonModel<I, E>, I extends Serializable> {
+public class CacheManagerRedis<E extends CommonModel<I, E>, I extends Serializable> implements InitializingBean {
 
+    private Cache cache;
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private CacheManager cacheManager;
 
-    private HashOperations<String, UUID, E> hashOperations;
+    private void cacheInit() {
+    }
 
-    public E submitCache(String cacheId, String key, E value) {
-        hashOperations
-        return null;
+    public void cachePut(String cacheId, I key, E value) {
+        Collection<String> cacheIds = cacheManager.getCacheNames();
+        cache = cacheManager.getCache(cacheId);
+        cache.put(key, value);
     }
 
     public E find(String cacheId, String key) {
@@ -39,5 +41,8 @@ public class CacheManagerRedis<E extends CommonModel<I, E>, I extends Serializab
         return false;
     }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        System.out.println("");
+    }
 }
-*/

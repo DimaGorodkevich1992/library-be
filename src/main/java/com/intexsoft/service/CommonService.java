@@ -1,6 +1,7 @@
 package com.intexsoft.service;
 
 import com.intexsoft.model.CommonModel;
+import com.intexsoft.repository.CacheManagerRedis;
 import com.intexsoft.repository.CommonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
@@ -12,7 +13,6 @@ import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public abstract class CommonService<E extends CommonModel<I, E>, I extends Serializable> {
 
@@ -21,6 +21,9 @@ public abstract class CommonService<E extends CommonModel<I, E>, I extends Seria
         hashOperations = redisTemplate.opsForHash();
         hashOperationsWithItems = redisTemplate.opsForHash();
     }
+
+    @Autowired
+    private CacheManagerRedis<E, I> cacheManagerRedis;
 
     @Autowired
     private CommonRepository<E, I> repository;
@@ -67,18 +70,28 @@ public abstract class CommonService<E extends CommonModel<I, E>, I extends Seria
                 : items;
     }
 
+    private boolean getCache(I hashKey) {
+        return false;
+    }
+
     public Observable<E> getById(I id) {
-        return Observable.just(id)
-                .map(v -> isExistCacheAndGetResult(commonCacheId(), v, repository.getById(v)))
+        return null; /*Observable.just(id)
+                .map(repository::getById)
+                .compose(observable ->
+                        Observable.fromCallable(() -> cachable(id)
+                                ? getCache(id)
+                                : observable
+                                .take(1)
+                                .doOnNext(v -> cachePut(id, v))))
                 .filter(Objects::nonNull)
                 .doOnNext(s -> isExistAndSubmitCache(commonCacheId(), s))
-                .subscribeOn(Schedulers.io());
+                .subscribeOn(Schedulers.io());*/
     }
 
     public Observable<E> store(E e) {
         return Observable.just(e)
                 .map(repository::save)
-                .doOnNext(v -> submitCacheAndDeleteItemsCache(commonCacheId(), v))
+                .doOnNext(v -> cacheManagerRedis.cachePut("commonBook", v.getId(), v))
                 .subscribeOn(Schedulers.io());
     }
 

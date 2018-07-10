@@ -1,21 +1,28 @@
 package com.intexsoft.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intexsoft.controller.filter.AuthFilter;
 import com.intexsoft.controller.filter.BookFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Configuration
 @EnableScheduling
+@EnableCaching
 public class AppConfig {
 
     @Value("${application.api.key}")
@@ -39,16 +46,27 @@ public class AppConfig {
         return filter;
     }
 
-    @Autowired
-    private LettuceConnectionFactory lettuceConnectionFactory;
-
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
-        final RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(lettuceConnectionFactory);
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(new LettuceConnectionFactory());
         template.setDefaultSerializer(new JdkSerializationRedisSerializer());
         template.setKeySerializer(new GenericJackson2JsonRedisSerializer());
         template.setHashKeySerializer(new GenericJackson2JsonRedisSerializer());
         return template;
+    }
+
+    @Bean
+    public CacheManager cacheManager() {
+        RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new JdkSerializationRedisSerializer()));
+        Set<String> set = new HashSet<>();
+        set.add("commonBooks");
+        set.add("commonLibraries");
+        
+        return RedisCacheManager.builder(new LettuceConnectionFactory().set)
+                .cacheDefaults(cacheConfiguration)
+                .initialCacheNames(set)
+                .build();
     }
 }

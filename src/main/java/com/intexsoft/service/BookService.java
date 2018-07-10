@@ -47,7 +47,7 @@ public class BookService extends CommonService<Book, UUID> {
 
     public Observable<Book> getByIdWithLibrary(UUID id) {
         return Observable.just(id)
-                .map(s -> isExistCacheAndGetResult(CACHE_ID_WITH_ITEMS, s, bookRepository.getByIdWithLibraries(s)))
+                .map(bookRepository::getByIdWithLibraries)
                 .filter(Objects::nonNull)
                 .doOnNext(s -> isExistAndSubmitCache(CACHE_ID_WITH_ITEMS, s))
                 .subscribeOn(Schedulers.io());
