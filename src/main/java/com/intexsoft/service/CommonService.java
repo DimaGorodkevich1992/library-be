@@ -1,7 +1,7 @@
 package com.intexsoft.service;
 
 import com.intexsoft.model.CommonModel;
-import com.intexsoft.repository.CacheManagerRx;
+import com.intexsoft.repository.CacheRx;
 import com.intexsoft.repository.CommonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import rx.Observable;
@@ -13,12 +13,14 @@ import java.util.Objects;
 public abstract class CommonService<E extends CommonModel<I, E>, I extends Serializable> {
 
     @Autowired
-    private CacheManagerRx<E> cacheManagerRx;
-
-    @Autowired
     private CommonRepository<E, I> repository;
 
-    protected abstract Class<E> getEntityClass();
+    protected abstract Class<I> getIdClass();
+
+    protected abstract Class<E> getModelClass();
+
+    @Autowired
+    protected CacheRx<E, I> cacheRx;
 
     protected abstract String searchCacheId();
 
@@ -29,11 +31,7 @@ public abstract class CommonService<E extends CommonModel<I, E>, I extends Seria
     public Observable<E> getById(I id) {
         return Observable.just(id)
                 .map(repository::getById)
-                .compose(observable ->
-                        Observable.fromCallable(() -> cacheManagerRx.isEmpty(commonCacheId(), id, getEntityClass())
-                                ? Observable.just(cacheManagerRx.find(commonCacheId(), id, getEntityClass()))
-                                : observable.doOnNext(v -> cacheManagerRx.cachePut(commonCacheId(), v.getId(), v))))
-                .compose(Observable::merge)
+                .compose(cacheRx.cachable(commonCacheId(), id, getModelClass()))
                 .filter(Objects::nonNull)
                 .subscribeOn(Schedulers.io());
     }
@@ -41,21 +39,17 @@ public abstract class CommonService<E extends CommonModel<I, E>, I extends Seria
     public Observable<E> store(E e) {
         return Observable.just(e)
                 .map(repository::save)
-                .doOnNext(v -> {
-                    cacheManagerRx.cachePut(commonCacheId(), v.getId(), v);
-                    cacheManagerRx.deleteCache(searchCacheId());
-                })
+                .compose(cacheRx.cachePut(commonCacheId()))
+                .compose(cacheRx.cacheDeleteAll(searchCacheId()))
                 .subscribeOn(Schedulers.io());
     }
 
     public Observable<E> update(E e) {
         return Observable.just(e)
                 .map(repository::update)
-                .doOnNext(v -> {
-                    cacheManagerRx.cachePut(commonCacheId(), v.getId(), v);
-                    cacheManagerRx.deleteCache(searchCacheId());
-                    cacheManagerRx.deleteItemOfCache(withItemsCacheId(), v.getId());
-                })
+                .compose(cacheRx.cachePut(commonCacheId()))
+                .compose(cacheRx.cacheDeleteAll(commonCacheId()))
+                .compose(cacheRx.cacheDelete(commonCacheId()))
                 .subscribeOn(Schedulers.io());
 
     }
@@ -63,11 +57,9 @@ public abstract class CommonService<E extends CommonModel<I, E>, I extends Seria
     public Observable<I> delete(I id) {
         return Observable.just(id)
                 .doOnNext(s -> repository.deleteById(s))
-                .doOnNext(v -> {
-                    cacheManagerRx.deleteItemOfCache(commonCacheId(), v);
-                    cacheManagerRx.deleteCache(searchCacheId());
-                    cacheManagerRx.deleteItemOfCache(withItemsCacheId(), v);
-                })
+                .compose(cacheRx.cacheDelete(commonCacheId(), id, getIdClass()))
+                .compose(cacheRx.cacheDelete(withItemsCacheId(), id, getIdClass()))
+                .compose(cacheRx.cacheDeleteAll(searchCacheId(), getIdClass()))
                 .subscribeOn(Schedulers.io());
     }
 

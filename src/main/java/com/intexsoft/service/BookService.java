@@ -23,6 +23,16 @@ public class BookService extends CommonService<Book, UUID> {
     private BookRepository bookRepository;
 
     @Override
+    protected Class<Book> getModelClass() {
+        return Book.class;
+    }
+
+    @Override
+    protected Class<UUID> getIdClass() {
+        return UUID.class;
+    }
+
+    @Override
     protected String searchCacheId() {
         return "searchBooks";
     }
@@ -37,13 +47,8 @@ public class BookService extends CommonService<Book, UUID> {
         return "bookWithItems";
     }
 
-    @Override
-    protected Class<Book> getEntityClass() {
-        return Book.class;
-    }
-
     public Observable<Book> searchBook(String name, String author) {
-        return  Observable.fromCallable(() -> bookRepository.searchBook(name, author))
+        return Observable.fromCallable(() -> bookRepository.searchBook(name, author))
                 .map(Observable::from)
                 .compose(Observable::merge)
                 .subscribeOn(Schedulers.io());
@@ -52,6 +57,7 @@ public class BookService extends CommonService<Book, UUID> {
     public Observable<Book> getByIdWithLibrary(UUID id) {
         return Observable.just(id)
                 .map(bookRepository::getByIdWithLibraries)
+                .compose(cacheRx.cachable(withItemsCacheId(), id, getModelClass()))
                 .filter(Objects::nonNull)
                 .subscribeOn(Schedulers.io());
     }
@@ -61,6 +67,8 @@ public class BookService extends CommonService<Book, UUID> {
                 .setId(new BookLibraryId()
                         .setBookId(bookId)
                         .setLibraryId(libraryId))))
+                .compose(cacheRx.cachePut(withItemsCacheId(), bookId, BookLibrary.class))
+                .compose(cacheRx.cacheDelete(withItemsCacheId(), bookId, BookLibrary.class))
                 .map(bl -> bookRepository.getByIdWithLibraries(bl.getId().getBookId()))
                 .subscribeOn(Schedulers.io());
     }
