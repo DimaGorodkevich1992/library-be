@@ -10,9 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -46,7 +44,7 @@ public class AppConfig {
         return filter;
     }
 
-    @Bean
+   /* @Bean
     public RedisTemplate<String, Object> redisTemplate() {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(new LettuceConnectionFactory());
@@ -54,19 +52,28 @@ public class AppConfig {
         template.setKeySerializer(new GenericJackson2JsonRedisSerializer());
         template.setHashKeySerializer(new GenericJackson2JsonRedisSerializer());
         return template;
-    }
+    }*/
+
+
+
+    
 
     @Bean
     public CacheManager cacheManager() {
         RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new JdkSerializationRedisSerializer()));
-        Set<String> set = new HashSet<>();
-        set.add("commonBooks");
-        set.add("commonLibraries");
-        
-        return RedisCacheManager.builder(new LettuceConnectionFactory().set)
+                .serializeValuesWith(RedisSerializationContext
+                        .SerializationPair
+                        .fromSerializer(new JdkSerializationRedisSerializer()));
+        Set<String> cacheId = new HashSet<>();
+        cacheId.add("commonBooks");
+        cacheId.add("commonLibraries");
+        cacheId.add("searchBooks");
+        cacheId.add("searchLibraries");
+        cacheId.add("bookWithItems");
+        cacheId.add("librariesWithItems");
+        return RedisCacheManager.builder(new JedisConnectionFactory())
                 .cacheDefaults(cacheConfiguration)
-                .initialCacheNames(set)
+                .initialCacheNames(cacheId)
                 .build();
     }
 }

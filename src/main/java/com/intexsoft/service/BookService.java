@@ -10,14 +10,11 @@ import org.springframework.stereotype.Service;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 @Service
 public class BookService extends CommonService<Book, UUID> {
-
-    private static final String CACHE_ID_WITH_ITEMS = "books";
 
     @Autowired
     private BookLibraryRepository bookLibraryRepository;
@@ -26,20 +23,27 @@ public class BookService extends CommonService<Book, UUID> {
     private BookRepository bookRepository;
 
     @Override
-    protected List<String> getListKeyToDeleteItems(List<String> cacheIdForItems) {
-        cacheIdForItems.add(CACHE_ID_WITH_ITEMS);
-        return super.getListKeyToDeleteItems(cacheIdForItems);
+    protected String searchCacheId() {
+        return "searchBooks";
     }
 
     @Override
     protected String commonCacheId() {
-        return "booksCommon";
+        return "commonBooks";
+    }
+
+    @Override
+    protected String withItemsCacheId() {
+        return "bookWithItems";
+    }
+
+    @Override
+    protected Class<Book> getEntityClass() {
+        return Book.class;
     }
 
     public Observable<Book> searchBook(String name, String author) {
-        return Observable.fromCallable(() -> isExistCAcheAndGetResultWithItemsList
-                (CACHE_ID_WITH_ITEMS, name + author, bookRepository.searchBook(name, author)))
-                .doOnNext(v -> isExistAndSubmitCacheWithItemsList(CACHE_ID_WITH_ITEMS, name + author, v))
+        return  Observable.fromCallable(() -> bookRepository.searchBook(name, author))
                 .map(Observable::from)
                 .compose(Observable::merge)
                 .subscribeOn(Schedulers.io());
@@ -49,7 +53,6 @@ public class BookService extends CommonService<Book, UUID> {
         return Observable.just(id)
                 .map(bookRepository::getByIdWithLibraries)
                 .filter(Objects::nonNull)
-                .doOnNext(s -> isExistAndSubmitCache(CACHE_ID_WITH_ITEMS, s))
                 .subscribeOn(Schedulers.io());
     }
 
@@ -59,7 +62,6 @@ public class BookService extends CommonService<Book, UUID> {
                         .setBookId(bookId)
                         .setLibraryId(libraryId))))
                 .map(bl -> bookRepository.getByIdWithLibraries(bl.getId().getBookId()))
-                .doOnNext(v -> hashOperations.put(CACHE_ID_WITH_ITEMS, bookId, v))
                 .subscribeOn(Schedulers.io());
     }
 

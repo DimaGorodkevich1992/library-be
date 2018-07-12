@@ -45,13 +45,8 @@ public abstract class JsonCommonRepository<E extends CommonModel<I, E>, I extend
         E var = getById(e.getId());
         synchronized (var) {
             if (var.getVersion() == e.getVersion()) {
-                try {
-                    BeanUtils.copyProperties(var, e);
-                    var.setVersion(var.getVersion() + 1);
-                } catch (ReflectiveOperationException ex) {
-                    log.error("Failed to copy properties", e.getId(), ex);
-                    throw new RuntimeException("failed to copy properties " + e.getId(), ex);
-                }
+                org.springframework.beans.BeanUtils.copyProperties(e, var);
+                var.setVersion(var.getVersion() + 1);
             } else {
                 log.error("Version mismatch!!! you version " +
                         e.toString() + " last version " + var.toString());
