@@ -31,7 +31,7 @@ public abstract class CommonService<E extends CommonModel<I, E>, I extends Seria
     public Observable<E> getById(I id) {
         return Observable.just(id)
                 .map(repository::getById)
-                .compose(cacheRx.cachable(commonCacheId(), id, getModelClass()))
+                .compose(cacheRx.cachable(commonCacheId(), id))
                 .filter(Objects::nonNull)
                 .subscribeOn(Schedulers.io());
     }
@@ -57,9 +57,9 @@ public abstract class CommonService<E extends CommonModel<I, E>, I extends Seria
     public Observable<I> delete(I id) {
         return Observable.just(id)
                 .doOnNext(s -> repository.deleteById(s))
-                .compose(cacheRx.cacheDelete(commonCacheId(), id, getIdClass()))
-                .compose(cacheRx.cacheDelete(withItemsCacheId(), id, getIdClass()))
-                .compose(cacheRx.cacheDeleteAll(searchCacheId(), getIdClass()))
+                .compose(cacheRx.cacheDelete(commonCacheId(), id))
+                .compose(cacheRx.cacheDelete(withItemsCacheId(), id))
+                .compose(cacheRx.cacheDeleteAll(searchCacheId()))
                 .subscribeOn(Schedulers.io());
     }
 

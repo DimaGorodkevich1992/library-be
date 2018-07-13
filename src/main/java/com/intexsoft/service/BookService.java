@@ -49,15 +49,15 @@ public class BookService extends CommonService<Book, UUID> {
 
     public Observable<Book> searchBook(String name, String author) {
         return Observable.fromCallable(() -> bookRepository.searchBook(name, author))
-                .map(Observable::from)
-                .compose(Observable::merge)
+                .flatMap(Observable::from)
+                .compose(cacheRx.cachable(searchCacheId(), name + author))
                 .subscribeOn(Schedulers.io());
     }
 
     public Observable<Book> getByIdWithLibrary(UUID id) {
         return Observable.just(id)
                 .map(bookRepository::getByIdWithLibraries)
-                .compose(cacheRx.cachable(withItemsCacheId(), id, getModelClass()))
+                .compose(cacheRx.cachable(withItemsCacheId(), id))
                 .filter(Objects::nonNull)
                 .subscribeOn(Schedulers.io());
     }
@@ -67,8 +67,8 @@ public class BookService extends CommonService<Book, UUID> {
                 .setId(new BookLibraryId()
                         .setBookId(bookId)
                         .setLibraryId(libraryId))))
-                .compose(cacheRx.cachePut(withItemsCacheId(), bookId, BookLibrary.class))
-                .compose(cacheRx.cacheDelete(withItemsCacheId(), bookId, BookLibrary.class))
+                .compose(cacheRx.cachePut(withItemsCacheId(), bookId))
+                .compose(cacheRx.cacheDelete(withItemsCacheId(), bookId))
                 .map(bl -> bookRepository.getByIdWithLibraries(bl.getId().getBookId()))
                 .subscribeOn(Schedulers.io());
     }

@@ -1,12 +1,16 @@
 package com.intexsoft.service;
 
+import com.intexsoft.model.BookLibrary;
+import com.intexsoft.model.BookLibraryId;
 import com.intexsoft.model.Library;
 import com.intexsoft.repository.BookLibraryRepository;
 import com.intexsoft.repository.LibraryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import rx.Observable;
+import rx.schedulers.Schedulers;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -46,30 +50,29 @@ public class LibraryService extends CommonService<Library, UUID> {
     }
 
     public Observable<Library> searchLibrary(String name, String address) {
-        return /*Observable.fromCallable(() -> isExistCAcheAndGetResultWithItemsList
-                (CACHE_ID_WITH_ITEMS, name + address, libraryRepository.searchLibrary(name, address)))
-                .doOnNext(v -> isExistAndSubmitCacheWithItemsList(CACHE_ID_WITH_ITEMS, name + address, v))
-                .map(Observable::from)
-                .compose(Observable::merge)
-                .subscribeOn(Schedulers.io());*/null;
+        return Observable.fromCallable(() -> libraryRepository.searchLibrary(name, address))
+                .flatMap(Observable::from)
+                .compose(cacheRx.cachable(searchCacheId(), name + address))
+                .subscribeOn(Schedulers.io());
     }
 
     public Observable<Library> getByIdWithBooks(UUID id) {
-        return /*Observable.just(id)
-                .map(s -> isExistCacheAndGetResult(CACHE_ID_WITH_ITEMS, s, libraryRepository.getByIdWithBooks(s)))
+        return Observable.just(id)
+                .map(s -> libraryRepository.getByIdWithBooks(s))
+                .compose(cacheRx.cachable(withItemsCacheId(), id))
                 .filter(Objects::nonNull)
-                .doOnNext(s -> isExistAndSubmitCache(CACHE_ID_WITH_ITEMS, s))
-                .subscribeOn(Schedulers.io());*/  null;
+                .subscribeOn(Schedulers.io());
     }
 
     public Observable<Library> addBook(UUID libraryId, UUID bookId) {
-        return /*Observable.fromCallable(() -> bookLibraryRepository.save(new BookLibrary()
+        return Observable.fromCallable(() -> bookLibraryRepository.save(new BookLibrary()
                 .setId(new BookLibraryId()
                         .setLibraryId(libraryId)
                         .setBookId(bookId))))
+                .compose(cacheRx.cachePut(withItemsCacheId(), bookId))
+                .compose(cacheRx.cacheDelete(withItemsCacheId(), bookId))
                 .map(bl -> libraryRepository.getByIdWithBooks(bl.getId().getLibraryId()))
-                .doOnNext(b -> hashOperations.put(CACHE_ID_WITH_ITEMS, b.getId(), b))
-                .subscribeOn(Schedulers.io());*/ null;
+                .subscribeOn(Schedulers.io());
     }
 
 }

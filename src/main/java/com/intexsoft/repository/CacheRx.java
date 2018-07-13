@@ -6,8 +6,12 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 import rx.Observable;
+import rx.functions.Action1;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 @Component
@@ -20,12 +24,15 @@ public class CacheRx<E extends CommonModel<I, E>, I extends Serializable> {
     @Autowired
     private CacheManager cacheManager;
 
-    private E find(String cacheId, Object itemKey, Class<E> clazz) {
-        return getCache(cacheId).get(itemKey, clazz);
+    private <S> List<S> find(String cacheId, Object itemKey) {
+        List<S> list = getCache(cacheId).get(itemKey, ArrayList.class);
+        return list;
     }
 
-    private void putCache(String cacheId, Object itemKey, Object value) {
-        getCache(cacheId).put(itemKey, value);
+    private <L> void putCache(String cacheId, Object itemKey, List<L> list) {
+        List<L> list2 = new ArrayList<>();
+        list2.addAll(list);
+        getCache(cacheId).put(itemKey, list2);
     }
 
     private boolean isEmpty(String cacheId, Object key) {
@@ -40,53 +47,40 @@ public class CacheRx<E extends CommonModel<I, E>, I extends Serializable> {
         getCache(cachedId).evict(itemHey);
     }
 
-    public Observable.Transformer<E, E> cachable(String cacheId, Object itemKey, Class<E> clazz) {
+    public <L> Observable.Transformer<L, L> cachable(String cacheId, Object itemKey) {
         return source -> Observable.fromCallable(() -> isEmpty(cacheId, itemKey))
                 .flatMap(empty -> empty
-                        ? Observable.just(find(cacheId, itemKey, clazz))
-                        : source.doOnNext(v -> putCache(cacheId, itemKey, v)));
-    }
-
-    public Observable.Transformer<E, E> cachePut(String cacheId, Object itemKey) {
-        return source -> Observable.fromCallable(() -> source)
-                .flatMap(observable -> source
-                        .doOnNext(v -> putCache(cacheId, itemKey, v)));
-    }
-
-    public <L> Observable.Transformer<L, L> cachePut(String cacheId, Object itemKey, Class<L> clazz) {
-        return source -> Observable.fromCallable(() -> source)
-                .flatMap(observable -> source
-                        .doOnNext(v -> putCache(cacheId, itemKey, v)));
+                        ? source
+                        .toList()
+                        .doOnNext(v -> putCache(cacheId, itemKey, v))
+                        .flatMap(Observable::from)
+                        : Observable.from(find(cacheId, itemKey)));
     }
 
     public Observable.Transformer<E, E> cachePut(String cacheId) {
-        return source -> Observable.fromCallable(() -> source)
-                .flatMap(observable -> source
-                        .doOnNext(v -> putCache(cacheId, v.getId(), v)));
+        return commonTransformer(s -> putCache(cacheId, s.getId(), Arrays.asList(s)));
     }
 
     public Observable.Transformer<E, E> cacheDelete(String cacheId) {
-        return source -> Observable.fromCallable(() -> source)
-                .flatMap(eObservable -> source
-                        .doOnNext(v -> delete(cacheId, v.getId())));
+        return commonTransformer(s -> delete(cacheId, s.getId()));
     }
 
-    public Observable.Transformer<E, E> cacheDeleteAll(String cacheId) {
-        return source -> Observable.fromCallable(() -> source)
-                .flatMap(observable -> source
-                        .doOnNext(v -> delete(cacheId)));
+    public <L> Observable.Transformer<L, L> cachePut(String cacheId, Object itemKey) {
+        return commonTransformer(s -> putCache(cacheId, itemKey, Arrays.asList(s)));
     }
 
-    public <L> Observable.Transformer<L, L> cacheDeleteAll(String cacheId, Class<L> clazz) {
-        return source -> Observable.fromCallable(() -> source)
-                .flatMap(observable -> source
-                        .doOnNext(v -> delete(cacheId)));
+    public <L> Observable.Transformer<L, L> cacheDeleteAll(String cacheId) {
+        return commonTransformer(s -> delete(cacheId));
     }
 
-    public <L> Observable.Transformer<L, L> cacheDelete(String cacheId, Object itemKey, Class<L> clazz) {
+    public <L> Observable.Transformer<L, L> cacheDelete(String cacheId, Object itemKey) {
+        return commonTransformer(s -> delete(cacheId, itemKey));
+    }
+
+    public <S> Observable.Transformer<S, S> commonTransformer(Action1<S> action1) {
         return source -> Observable.fromCallable(() -> source)
-                .flatMap(eObservable -> source
-                        .doOnNext(v -> delete(cacheId, itemKey)));
+                .flatMap(objectObservable -> source
+                        .doOnNext(action1));
     }
 
 }

@@ -64,16 +64,8 @@ public class AppConfig {
                 .serializeValuesWith(RedisSerializationContext
                         .SerializationPair
                         .fromSerializer(new JdkSerializationRedisSerializer()));
-        Set<String> cacheId = new HashSet<>();
-        cacheId.add("commonBooks");
-        cacheId.add("commonLibraries");
-        cacheId.add("searchBooks");
-        cacheId.add("searchLibraries");
-        cacheId.add("bookWithItems");
-        cacheId.add("librariesWithItems");
         return RedisCacheManager.builder(new JedisConnectionFactory())
                 .cacheDefaults(cacheConfiguration)
-                .initialCacheNames(cacheId)
                 .build();
     }
 }
