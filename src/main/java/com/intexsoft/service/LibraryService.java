@@ -25,16 +25,6 @@ public class LibraryService extends CommonService<Library, UUID> {
     private LibraryRepository libraryRepository;
 
     @Override
-    protected Class<Library> getModelClass() {
-        return Library.class;
-    }
-
-    @Override
-    protected Class<UUID> getIdClass() {
-        return UUID.class;
-    }
-
-    @Override
     protected String searchCacheId() {
         return "searchLibraries";
     }

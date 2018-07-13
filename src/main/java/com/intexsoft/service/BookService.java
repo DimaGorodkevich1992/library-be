@@ -23,16 +23,6 @@ public class BookService extends CommonService<Book, UUID> {
     private BookRepository bookRepository;
 
     @Override
-    protected Class<Book> getModelClass() {
-        return Book.class;
-    }
-
-    @Override
-    protected Class<UUID> getIdClass() {
-        return UUID.class;
-    }
-
-    @Override
     protected String searchCacheId() {
         return "searchBooks";
     }

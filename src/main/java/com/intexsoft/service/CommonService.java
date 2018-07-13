@@ -15,10 +15,6 @@ public abstract class CommonService<E extends CommonModel<I, E>, I extends Seria
     @Autowired
     private CommonRepository<E, I> repository;
 
-    protected abstract Class<I> getIdClass();
-
-    protected abstract Class<E> getModelClass();
-
     @Autowired
     protected CacheRx<E, I> cacheRx;
 

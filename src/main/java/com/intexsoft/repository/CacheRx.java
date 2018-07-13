@@ -25,13 +25,11 @@ public class CacheRx<E extends CommonModel<I, E>, I extends Serializable> {
     private CacheManager cacheManager;
 
     private <S> List<S> find(String cacheId, Object itemKey) {
-        List<S> list = getCache(cacheId).get(itemKey, ArrayList.class);
-        return list;
+        return getCache(cacheId).get(itemKey, ArrayList::new);
     }
 
     private <L> void putCache(String cacheId, Object itemKey, List<L> list) {
-        List<L> list2 = new ArrayList<>();
-        list2.addAll(list);
+        List<L> list2 = new ArrayList<>(list);
         getCache(cacheId).put(itemKey, list2);
     }
 
@@ -49,7 +47,8 @@ public class CacheRx<E extends CommonModel<I, E>, I extends Serializable> {
 
     public <L> Observable.Transformer<L, L> cachable(String cacheId, Object itemKey) {
         return source -> Observable.fromCallable(() -> isEmpty(cacheId, itemKey))
-                .flatMap(empty -> empty
+                .flatMap(empty ->
+                        empty
                         ? source
                         .toList()
                         .doOnNext(v -> putCache(cacheId, itemKey, v))
