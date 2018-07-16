@@ -24,32 +24,35 @@ public class LibraryService extends CommonService<Library, UUID> {
     @Autowired
     private LibraryRepository libraryRepository;
 
+    @Autowired
+    private BookService bookService;
+
     @Override
     protected String searchCacheId() {
         return "searchLibraries";
     }
 
     @Override
-    protected String withItemsCacheId() {
+    protected String entityWithItemsCacheId() {
         return "libraryWithBooks";
     }
 
     @Override
-    protected String commonCacheId() {
+    protected String entityCacheId() {
         return "commonLibraries";
     }
 
     public Observable<Library> searchLibrary(String name, String address) {
         return Observable.fromCallable(() -> libraryRepository.searchLibrary(name, address))
                 .flatMap(Observable::from)
-                .compose(cacheRx.cachable(searchCacheId(), name + address))
+                .compose(cacheRx.cachable(searchCacheId(), name, address))
                 .subscribeOn(Schedulers.io());
     }
 
     public Observable<Library> getByIdWithBooks(UUID id) {
         return Observable.just(id)
                 .map(s -> libraryRepository.getByIdWithBooks(s))
-                .compose(cacheRx.cachable(withItemsCacheId(), id))
+                .compose(cacheRx.cachable(entityWithItemsCacheId(), id))
                 .filter(Objects::nonNull)
                 .subscribeOn(Schedulers.io());
     }
@@ -59,9 +62,9 @@ public class LibraryService extends CommonService<Library, UUID> {
                 .setId(new BookLibraryId()
                         .setLibraryId(libraryId)
                         .setBookId(bookId))))
-                .compose(cacheRx.cachePut(withItemsCacheId(), bookId))
-                .compose(cacheRx.cacheDelete(withItemsCacheId(), bookId))
                 .map(bl -> libraryRepository.getByIdWithBooks(bl.getId().getLibraryId()))
+                .compose(cacheRx.cachePut(entityWithItemsCacheId(), Library::getId))
+                .compose(cacheRx.cachePut(bookService.searchCacheId(), s -> bookId))
                 .subscribeOn(Schedulers.io());
     }
 

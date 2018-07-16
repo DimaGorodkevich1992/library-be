@@ -34,15 +34,19 @@ public class JsonBookRepository extends JsonCommonRepository<Book, UUID> impleme
     @Override
     public Book getByIdWithLibraries(UUID id) {
         Book book = getById(id);
-        JsonData jsonData = jsonDataHolder.getJsonData();
-        Set<BookLibrary> bookLibraries = findRightRelatedEntities(book, jsonData.getBookLibraryIds(), jsonData.getLibraries())
-                .stream()
-                .map(library -> new BookLibrary()
-                        .setId(new BookLibraryId().setBookId(id).setLibraryId(library.getId()))
-                        .setBook(book)
-                        .setLibrary(library))
-                .collect(toSet());
-        return book.setLibraries(bookLibraries);
+        if (Objects.equals(book, null)) {
+            return book;
+        } else {
+            JsonData jsonData = jsonDataHolder.getJsonData();
+            Set<BookLibrary> bookLibraries = findRightRelatedEntities(book, jsonData.getBookLibraryIds(), jsonData.getLibraries())
+                    .stream()
+                    .map(library -> new BookLibrary()
+                            .setId(new BookLibraryId().setBookId(id).setLibraryId(library.getId()))
+                            .setBook(book)
+                            .setLibrary(library))
+                    .collect(toSet());
+            return book.setLibraries(bookLibraries);
+        }
     }
 
     @Override

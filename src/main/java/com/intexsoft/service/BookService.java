@@ -22,32 +22,35 @@ public class BookService extends CommonService<Book, UUID> {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private LibraryService libraryService;
+
     @Override
     protected String searchCacheId() {
         return "searchBooks";
     }
 
     @Override
-    protected String commonCacheId() {
+    protected String entityCacheId() {
         return "commonBooks";
     }
 
     @Override
-    protected String withItemsCacheId() {
+    protected String entityWithItemsCacheId() {
         return "bookWithItems";
     }
 
     public Observable<Book> searchBook(String name, String author) {
         return Observable.fromCallable(() -> bookRepository.searchBook(name, author))
+                .compose(cacheRx.cachable(searchCacheId(), name, author))
                 .flatMap(Observable::from)
-                .compose(cacheRx.cachable(searchCacheId(), name + author))
                 .subscribeOn(Schedulers.io());
     }
 
     public Observable<Book> getByIdWithLibrary(UUID id) {
         return Observable.just(id)
                 .map(bookRepository::getByIdWithLibraries)
-                .compose(cacheRx.cachable(withItemsCacheId(), id))
+                .compose(cacheRx.cachable(entityWithItemsCacheId(), id))
                 .filter(Objects::nonNull)
                 .subscribeOn(Schedulers.io());
     }
@@ -57,9 +60,9 @@ public class BookService extends CommonService<Book, UUID> {
                 .setId(new BookLibraryId()
                         .setBookId(bookId)
                         .setLibraryId(libraryId))))
-                .compose(cacheRx.cachePut(withItemsCacheId(), bookId))
-                .compose(cacheRx.cacheDelete(withItemsCacheId(), bookId))
                 .map(bl -> bookRepository.getByIdWithLibraries(bl.getId().getBookId()))
+                .compose(cacheRx.cachePut(entityWithItemsCacheId(), Book::getId))
+                .compose(cacheRx.cachePut(libraryService.entityWithItemsCacheId(), s -> libraryId))
                 .subscribeOn(Schedulers.io());
     }
 
