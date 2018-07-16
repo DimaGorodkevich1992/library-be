@@ -10,7 +10,7 @@ import rx.functions.Action1;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,9 +28,9 @@ public class CacheRx<E extends CommonModel<I, E>, I extends Serializable> {
         return getCache(cacheId).get(itemKey, ArrayList::new);
     }
 
-    private <L> void putCache(String cacheId, Object itemKey, List<L> list) {
-        List<L> list2 = new ArrayList<>(list);
-        getCache(cacheId).put(itemKey, list2);
+    private <L> void putCache(String cacheId, Object itemKey, List<L> listItems) {
+        List<L> tmpListItems = new ArrayList<>(listItems);
+        getCache(cacheId).put(itemKey, tmpListItems);
     }
 
     private boolean isEmpty(String cacheId, Object key) {
@@ -47,17 +47,16 @@ public class CacheRx<E extends CommonModel<I, E>, I extends Serializable> {
 
     public <L> Observable.Transformer<L, L> cachable(String cacheId, Object itemKey) {
         return source -> Observable.fromCallable(() -> isEmpty(cacheId, itemKey))
-                .flatMap(empty ->
-                        empty
+                .flatMap(empty -> empty
                         ? source
-                        .toList()
-                        .doOnNext(v -> putCache(cacheId, itemKey, v))
-                        .flatMap(Observable::from)
+                            .toList()
+                            .doOnNext(v -> putCache(cacheId, itemKey, v))
+                            .flatMap(Observable::from)
                         : Observable.from(find(cacheId, itemKey)));
     }
 
     public Observable.Transformer<E, E> cachePut(String cacheId) {
-        return commonTransformer(s -> putCache(cacheId, s.getId(), Arrays.asList(s)));
+        return commonTransformer(s -> putCache(cacheId, s.getId(), Collections.singletonList(s)));
     }
 
     public Observable.Transformer<E, E> cacheDelete(String cacheId) {
@@ -65,7 +64,7 @@ public class CacheRx<E extends CommonModel<I, E>, I extends Serializable> {
     }
 
     public <L> Observable.Transformer<L, L> cachePut(String cacheId, Object itemKey) {
-        return commonTransformer(s -> putCache(cacheId, itemKey, Arrays.asList(s)));
+        return commonTransformer(s -> putCache(cacheId, itemKey, Collections.singletonList(s)));
     }
 
     public <L> Observable.Transformer<L, L> cacheDeleteAll(String cacheId) {

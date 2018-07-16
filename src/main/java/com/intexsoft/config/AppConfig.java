@@ -15,9 +15,6 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Configuration
 @EnableScheduling
 @EnableCaching
@@ -43,20 +40,6 @@ public class AppConfig {
         filter.addServletNames("BookServlet");
         return filter;
     }
-
-   /* @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(new LettuceConnectionFactory());
-        template.setDefaultSerializer(new JdkSerializationRedisSerializer());
-        template.setKeySerializer(new GenericJackson2JsonRedisSerializer());
-        template.setHashKeySerializer(new GenericJackson2JsonRedisSerializer());
-        return template;
-    }*/
-
-
-
-    
 
     @Bean
     public CacheManager cacheManager() {
