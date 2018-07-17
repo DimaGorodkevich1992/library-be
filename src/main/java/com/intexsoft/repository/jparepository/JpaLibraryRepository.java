@@ -22,7 +22,7 @@ public class JpaLibraryRepository extends JpaCommonRepository<Library, UUID> imp
 
     @Override
     public Library getByIdWithBooks(UUID id) {
-        return getById(id, Arrays.asList("books,book"));
+        return getById(id, Collections.singletonList("books,book"));
     }
 
     @Override

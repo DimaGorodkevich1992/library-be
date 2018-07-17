@@ -16,8 +16,6 @@ import java.util.UUID;
 @Service
 public class LibraryService extends CommonService<Library, UUID> {
 
-    private static final String CACHE_ID_WITH_ITEMS = "libraries";
-
     @Autowired
     private BookLibraryRepository bookLibraryRepository;
 
@@ -68,4 +66,17 @@ public class LibraryService extends CommonService<Library, UUID> {
                 .subscribeOn(Schedulers.io());
     }
 
+    @Override
+    public Observable<Library> update(Library library) {
+        return super.update(library)
+                .compose(cacheRx.cacheDeleteAll(bookService.entityWithItemsCacheId()))
+                .subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Observable<UUID> delete(UUID id) {
+        return super.delete(id)
+                .compose(cacheRx.cacheDeleteAll(bookService.entityWithItemsCacheId()))
+                .subscribeOn(Schedulers.io());
+    }
 }

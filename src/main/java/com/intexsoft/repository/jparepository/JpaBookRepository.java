@@ -23,7 +23,7 @@ public class JpaBookRepository extends JpaCommonRepository<Book, UUID> implement
 
     @Override
     public Book getByIdWithLibraries(UUID id) {
-        return getById(id, Arrays.asList("libraries,library"));
+        return getById(id, Collections.singletonList("libraries,library"));
     }
 
     @Override

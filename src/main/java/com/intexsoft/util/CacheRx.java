@@ -48,9 +48,9 @@ public class CacheRx {
         return source -> Observable.fromCallable(() -> isEmpty(cacheId, itemKey))
                 .flatMap(empty -> empty
                         ? source
-                        .toList()
-                        .doOnNext(v -> putCache(cacheId, itemKey, v))
-                        .flatMap(Observable::from)
+                            .toList()
+                            .doOnNext(v -> putCache(cacheId, itemKey, v))
+                            .flatMap(Observable::from)
                         : Observable.from(find(cacheId, itemKey)));
     }
 

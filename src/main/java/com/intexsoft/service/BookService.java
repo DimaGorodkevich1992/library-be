@@ -66,4 +66,17 @@ public class BookService extends CommonService<Book, UUID> {
                 .subscribeOn(Schedulers.io());
     }
 
+    @Override
+    public Observable<Book> update(Book book) {
+        return super.update(book)
+                .compose(cacheRx.cacheDeleteAll(libraryService.entityWithItemsCacheId()))
+                .subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Observable<UUID> delete(UUID id) {
+        return super.delete(id)
+                .compose(cacheRx.cacheDeleteAll(libraryService.entityWithItemsCacheId()))
+                .subscribeOn(Schedulers.io());
+    }
 }
