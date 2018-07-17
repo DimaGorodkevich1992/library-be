@@ -1,25 +1,38 @@
-/*
 package com.intexsoft.repository;
 
-
 import com.intexsoft.ClientServiceRunner;
+import com.intexsoft.model.Book;
 import com.intexsoft.repository.sqlrepository.SqlBookRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
 
 @Slf4j
 @ContextConfiguration(classes = {ClientServiceRunner.class})
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest("classpath:application.properties")
-public class SqlBookRepositoryTest {
+@SpringBootTest
+@TestPropertySource("classpath:sql-repository.properties")
+public class SqlBookRepositoryTest implements InitializingBean {
+
     @Autowired
     private NamedParameterJdbcTemplate jdbcTemplate;
     @Autowired
@@ -31,16 +44,7 @@ public class SqlBookRepositoryTest {
     private UUID id3 = UUID.fromString("d6d1d9ec-ab8f-4afa-935e-f636f10b45b2");
     private UUID library = UUID.fromString("31d9ccae-6fed-4a84-b979-43b757e6c146");
 
-    @Test
-    public void testConfig() {
-
-    }
-
     public Book getBook() {
-        Library library = new Library();
-        library.setId(library);
-
-        Book book = new Book();
         String dateString = "2018-04-24";
         Date date = null;
         try {
@@ -48,13 +52,13 @@ public class SqlBookRepositoryTest {
         } catch (ParseException e) {
             log.warn("Cannot parse date", e);
         }
-        book.setId(id);
-        book.setName("name");
-        book.setAuthor("author");
-        book.setPublished(date);
-        book.setNumberPages(300);
-        book.setVersion(1);
-        return book;
+        return new Book()
+                .setId(id)
+                .setName("name")
+                .setAuthor("author")
+                .setPublished(date)
+                .setNumberPages(300)
+                .setVersion(1);
     }
 
     @Before
@@ -74,42 +78,73 @@ public class SqlBookRepositoryTest {
         sqlBookRepositoryTest.deleteById(id2);
     }
 
+    @Test
+    public void correctSave() {
+    }
 
     @Test
-    public void saveBookCorrect() {
-        Book book = new Book();
-        BeanUtils.copyProperties(getBook(), book);
-        book.setName("name2");
-        book.setId(id3);
-        sqlBookRepositoryTest.save(book);
-        assertEquals(book, sqlBookRepositoryTest.getByIdWithJoins(id3));
-        sqlBookRepositoryTest.deleteById(id3);
+    public void getByIdCorrectId() {
+    }
+
+    @Test
+    public void getByIdIncorrectId() {
+    }
+
+    @Test
+    public void getByIdWithItemsIncorrectId() {
+    }
+
+    @Test
+    public void getByIdWithEmptyItems() {
+    }
+
+    @Test
+    public void getByidWithFullItems() {
+    }
+
+    @Test
+    public void updateCorrect() {
+    }
+
+    @Test
+    public void updateIncorrectVersion() {
+    }
+
+    @Test
+    public void updateDuplicateName() {
+    }
+
+    @Test
+    public void searchByNull() {
+    }
+
+    @Test
+    public void searchByName() {
+    }
+
+    @Test
+    public void searchByAuthor() {
+    }
+
+    @Test
+    public void searchByNameAndAuthors() {
+    }
+
+    @Test
+    public void addLibrary() {
+    }
+
+    @Test
+    public void addDuplicateLibrary() {
+    }
+
+    @Test
+    public void addNotExistingLibrary() {
     }
 
     @Test(expected = DuplicateKeyException.class)
     public void saveBookDuplicateName() {
         sqlBookRepositoryTest.save(getBook());
-    }
-
-    @Test
-    public void getByIdCaseCorrectId() {
-        Book wantedBook = sqlBookRepositoryTest.getByIdWithJoins(id);
-        assertEquals(getBook(), wantedBook);
-    }
-
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void getByIdCaseIncorrectId() {
-        sqlBookRepositoryTest.getByIdWithJoins(wrongId);
-
-    }
-
-    @Test
-    public void updateBookCorrect() {
-        Book book = new Book();
-        BeanUtils.copyProperties(getBook(), book);
-        book.setAuthor("tolkien");
-        sqlBookRepositoryTest.update(book);
-        assertEquals(2, sqlBookRepositoryTest.getByIdWithJoins(id).getVersion());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -122,37 +157,31 @@ public class SqlBookRepositoryTest {
 
     @Test
     public void searchBookByNull() {
-        List<Book> wantedList = sqlBookRepositoryTest.searchLibrary(null, null);
+        List<Book> wantedList = sqlBookRepositoryTest.searchBook(null, null);
         assertEquals(2, wantedList.size());
     }
 
     @Test
     public void searchBookByName() {
-        List<Book> wantedList = sqlBookRepositoryTest.searchLibrary("name1", null);
+        List<Book> wantedList = sqlBookRepositoryTest.searchBook("name1", null);
         assertEquals("name1", wantedList.get(0).getName());
     }
 
     @Test
     public void searchBookByAuthor() {
-        List<Book> wantedList = sqlBookRepositoryTest.searchLibrary(null, "author");
+        List<Book> wantedList = sqlBookRepositoryTest.searchBook(null, "author");
         wantedList.forEach(s -> assertEquals("author", s.getAuthor()));
     }
 
     @Test
     public void searchBookByNameAndAuthor() {
-        List<Book> wantedList = sqlBookRepositoryTest.searchLibrary("name", "author");
+        List<Book> wantedList = sqlBookRepositoryTest.searchBook("name", "author");
         assertEquals("name", wantedList.get(0).getName());
         assertEquals("author", wantedList.get(0).getAuthor());
     }
 
-    @Test(expected = EmptyResultDataAccessException.class)
-    public void deleteByIdCorrectId() {
-        Book book = new Book();
-        BeanUtils.copyProperties(getBook(), book);
-        book.setName("name2");
-        book.setId(id3);
-        sqlBookRepositoryTest.save(book);
-        sqlBookRepositoryTest.deleteById(id3);
-        sqlBookRepositoryTest.getByIdWithJoins(id3);
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        System.out.println("");
     }
-}*/
+}

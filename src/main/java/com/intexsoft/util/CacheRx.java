@@ -72,4 +72,7 @@ public class CacheRx {
                         .doOnNext(typeOperation));
     }
 
+    public void cleanCache(String cacheId){
+        delete(cacheId);
+    }
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import rx.Observable;
 import rx.schedulers.Schedulers;
 
+import javax.annotation.PreDestroy;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -24,6 +25,13 @@ public class BookService extends CommonService<Book, UUID> {
 
     @Autowired
     private LibraryService libraryService;
+
+    @PreDestroy
+    private void cleanCache() {
+        cacheRx.cleanCache(searchCacheId());
+        cacheRx.cleanCache(entityWithItemsCacheId());
+        cacheRx.cleanCache(entityCacheId());
+    }
 
     @Override
     protected String searchCacheId() {
