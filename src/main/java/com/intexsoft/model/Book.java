@@ -28,7 +28,7 @@ public class Book extends CommonModel<UUID, Book> implements Serializable {
     private String author;
     @Column(name = "number_pages")
     private Integer numberPages;
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book",cascade = CascadeType.REMOVE)
     private Set<BookLibrary> libraries = new HashSet<>();
 
     @Override

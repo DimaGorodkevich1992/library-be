@@ -66,6 +66,7 @@ public abstract class JpaCommonRepository<E extends CommonModel<I, E>, I extends
         return getById(e.getId());
     }
 
+    @Transactional
     @Override
     public void deleteById(I id) {
         em.remove(getById(id));

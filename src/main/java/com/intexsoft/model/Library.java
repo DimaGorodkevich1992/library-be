@@ -23,7 +23,7 @@ public class Library extends CommonModel<UUID, Library> implements Serializable 
     private UUID id;
     private String name;
     private String address;
-    @OneToMany(mappedBy = "library")
+    @OneToMany(mappedBy = "library",cascade = CascadeType.REMOVE)
     private Set<BookLibrary> books = new HashSet<>();
 
     @Override
