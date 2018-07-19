@@ -1,6 +1,5 @@
 package com.intexsoft.repository;
 
-import com.intexsoft.ClientServiceRunner;
 import com.intexsoft.model.Book;
 import com.intexsoft.model.BookLibrary;
 import com.intexsoft.model.BookLibraryId;
@@ -17,10 +16,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,25 +27,24 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 @Slf4j
-@ContextConfiguration(classes = {ClientServiceRunner.class})
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 @TestPropertySource("classpath:sql-repository.properties")
-public class SqlBookRepositoryTest {
+public class SqlLibraryRepositoryTest {
 
-    @Autowired
-    private SqlBookRepository bookRepositoryTest;
     @Autowired
     private SqlLibraryRepository libraryRepositoryTest;
     @Autowired
+    private SqlBookRepository bookRepositoryTest;
+    @Autowired
     private SqlBookLibraryRepository bookLibraryRepositoryTest;
 
-    private UUID bookId = UUID.fromString("d3e32870-f061-4a86-8e65-a97a8bd42d4e");
+    private UUID libraryId = UUID.fromString("d3e32870-f061-4a86-8e65-a97a8bd42d4e");
     private UUID wrongId = UUID.fromString("2faa9b95-391e-491b-bb69-4b25ba07a352");
     private UUID saveId = UUID.fromString("d6d1d9ec-ab8f-4afa-935e-f636f10b45b2");
-    private UUID libraryId = UUID.fromString("31d9ccae-6fed-4a84-b979-43b757e6c146");
+    private UUID bookId = UUID.fromString("31d9ccae-6fed-4a84-b979-43b757e6c146");
     private String name = "name";
-    private String author = "author";
+    private String address = "author";
 
     private Date getDate() {
         String dateString = "2018-04-24";
@@ -60,92 +57,95 @@ public class SqlBookRepositoryTest {
         return date;
     }
 
-    private Book getBook() {
-        return new Book()
-                .setId(bookId)
+    private Library getLibrary() {
+        return new Library()
+                .setId(libraryId)
                 .setName(name)
-                .setAuthor(author)
-                .setPublished(getDate())
-                .setNumberPages(300);
+                .setAddress(address);
     }
 
     @Before
     public void initializedBookAndLibrary() {
-        libraryRepositoryTest.save(new Library()
-                .setId(libraryId)
-                .setName("initializeLibrary")
-                .setAddress("initializeLibrary"));
-        bookRepositoryTest.save(getBook());
+        bookRepositoryTest.save(new Book()
+                .setId(bookId)
+                .setName("initializeBook")
+                .setAuthor("initializeBook")
+                .setPublished(getDate())
+                .setNumberPages(300));
+        libraryRepositoryTest.save(getLibrary());
     }
 
     @After
-    public void deleteBook() {
-        bookRepositoryTest.deleteById(bookId);
+    public void deleteLibrary() {
         libraryRepositoryTest.deleteById(libraryId);
+        bookRepositoryTest.deleteById(bookId);
     }
 
     @Test
     public void generatedIdWhereIdNull() {
-        assertNotNull(bookRepositoryTest.getGeneratedId(new Book().setId(null)));
+        assertNotNull(libraryRepositoryTest.getGeneratedId(new Library().setId(null)));
     }
 
     @Test
     public void generatedIdWhereIdNotNull() {
-        assertEquals(bookId, bookRepositoryTest.getGeneratedId(new Book().setId(bookId)));
+        assertEquals(libraryId, libraryRepositoryTest.getGeneratedId(new Library().setId(libraryId)));
     }
 
     @Test
     public void correctSave() {
-        Book book = new Book().setId(saveId)
+        Library library = new Library()
+                .setId(saveId)
                 .setName("correctSave")
-                .setAuthor("correctSave")
-                .setPublished(getDate())
-                .setNumberPages(500);
-        bookRepositoryTest.save(book);
-        assertEquals(book, bookRepositoryTest.getById(saveId));
-        bookRepositoryTest.deleteById(saveId);
+                .setAddress("correctSave");
+        assertEquals(library, libraryRepositoryTest.save(library));
+        libraryRepositoryTest.deleteById(saveId);
     }
 
-    @Test(expected = DuplicateKeyException.class)
+    @Test(expected = DataIntegrityViolationException.class)
     public void incorrectSaveDuplicateName() {
-        bookRepositoryTest.save(getBook());
+        libraryRepositoryTest.save(getLibrary());
     }
 
     @Test
+    @Transactional
     public void getByIdCorrectId() {
-        assertEquals(getBook().setVersion(1), bookRepositoryTest.getById(bookId));
+        assertEquals(getLibrary().setVersion(1), libraryRepositoryTest.getById(libraryId));
     }
 
     @Test
+    @Transactional
     public void getByIdIncorrectId() {
-        assertNull(bookRepositoryTest.getById(wrongId));
+        assertNull(libraryRepositoryTest.getById(wrongId));
     }
 
     @Test
     public void getByIdWithItemsIncorrectId() {
-        assertNull(bookRepositoryTest.getById(wrongId));
+        assertNull(libraryRepositoryTest.getById(wrongId));
     }
 
     @Test
     public void getByIdWithEmptyItems() {
-        assertEquals(Collections.emptySet(), bookRepositoryTest.getByIdWithLibraries(bookId).getLibraries());
+        assertEquals(Collections.emptySet(), libraryRepositoryTest.getByIdWithBooks(libraryId).getBooks());
     }
 
     @Test
     public void addLibraryAndGetByIdWithFullItems() {
-        UUID libraryId2 = UUID.fromString("877555ad-7167-40d5-a40f-1ccf45e6b071");
-        libraryRepositoryTest.save(new Library()
-                .setId(libraryId2)
-                .setName("addLibraryAndGetByIdWithFullItems")
-                .setAddress("addLibraryAndGetByIdWithFullItems"));
+        UUID bookId2 = UUID.fromString("5fe88d0c-0f75-4add-b8ac-e5d4b61963d1");
+        //   UUID libraryId2 = UUID.fromString("877555ad-7167-40d5-a40f-1ccf45e6b071");
+        bookRepositoryTest.save(new Book()
+                .setId(bookId2)
+                .setName(name)
+                .setAuthor("addLibraryAndGetByIdWithFullItems")
+                .setPublished(getDate())
+                .setNumberPages(300));
         bookLibraryRepositoryTest.save(new BookLibrary()
                 .setId(new BookLibraryId()
                         .setBookId(bookId)
                         .setLibraryId(libraryId)));
         bookLibraryRepositoryTest.save(new BookLibrary()
                 .setId(new BookLibraryId()
-                        .setBookId(bookId)
-                        .setLibraryId(libraryId2)));
+                        .setBookId(bookId2)
+                        .setLibraryId(libraryId)));
         BookLibrary bookLibrary = new BookLibrary()
                 .setId(new BookLibraryId()
                         .setBookId(bookId)
@@ -153,112 +153,102 @@ public class SqlBookRepositoryTest {
                 .setVersion(1);
         BookLibrary bookLibrary2 = new BookLibrary()
                 .setId(new BookLibraryId()
-                        .setBookId(bookId)
-                        .setLibraryId(libraryId2))
+                        .setBookId(bookId2)
+                        .setLibraryId(libraryId))
                 .setVersion(1);
 
-        long count = bookRepositoryTest.getByIdWithLibraries(bookId).getLibraries().stream()
+        long count = libraryRepositoryTest.getByIdWithBooks(libraryId).getBooks().stream()
                 .filter(s-> Objects.equals(s, bookLibrary)||Objects.equals(s, bookLibrary2))
                 .count();
         assertEquals(2 , count);
-        libraryRepositoryTest.deleteById(libraryId2);
+        bookRepositoryTest.deleteById(bookId2);
     }
 
     @Test
     public void updateCorrect() {
-        Book bookToUpdate = new Book();
-        BeanUtils.copyProperties(getBook(), bookToUpdate);
-        bookToUpdate
+        Library libraryToUpdate = new Library()
+                .setId(libraryId)
                 .setName("updateCorrect")
-                .setAuthor("updateCorrect")
+                .setAddress("updateCorrect")
                 .setVersion(1);
-        assertEquals(getBook()
-                        .setAuthor("updateCorrect")
-                        .setVersion(2)
-                        .setName("updateCorrect"),
-                bookRepositoryTest.update(bookToUpdate));
+        libraryRepositoryTest.update(libraryToUpdate);
+        assertEquals("updateCorrect", libraryRepositoryTest.getById(libraryId).getName());
+        assertEquals("updateCorrect", libraryRepositoryTest.getById(libraryId).getAddress());
+        assertEquals(2, libraryRepositoryTest.getById(libraryId).getVersion());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void updateIncorrectVersion() {
-        Book bookToUpdate = new Book();
-        BeanUtils.copyProperties(getBook(), bookToUpdate);
-        bookToUpdate
+        Library libraryToUpdate = new Library();
+        BeanUtils.copyProperties(getLibrary(), libraryToUpdate);
+        libraryToUpdate
                 .setName("updateCorrect")
-                .setAuthor("updateCorrect")
+                .setAddress("updateCorrect")
                 .setVersion(33);
-        assertEquals(getBook()
-                        .setAuthor("updateCorrect")
-                        .setVersion(33)
-                        .setName("updateCorrect"),
-                bookRepositoryTest.update(bookToUpdate));
+        libraryRepositoryTest.update(libraryToUpdate);
     }
 
     @Test
     public void searchByNull() {
         UUID id = UUID.fromString("e5aaccf8-0cca-4f38-a30d-747eac1d2adc");
-        bookRepositoryTest.save(new Book()
+        libraryRepositoryTest.save(new Library()
                 .setId(id)
                 .setName("searchByNull")
-                .setAuthor("searchByNull")
-                .setPublished(getDate())
-                .setNumberPages(500));
-        List<Book> wantedList = bookRepositoryTest.searchBook(null, null);
+                .setAddress("searchByNull"));
+        List<Library> wantedList = libraryRepositoryTest.searchLibrary(null, null);
         assertEquals(2, wantedList.size());
-        bookRepositoryTest.deleteById(id);
+        libraryRepositoryTest.deleteById(id);
     }
 
     @Test
     public void searchByName() {
-        List<Book> wantedList = bookRepositoryTest.searchBook(name, null);
+        List<Library> wantedList = libraryRepositoryTest.searchLibrary(name, null);
         assertEquals(name, wantedList.get(0).getName());
     }
 
     @Test
     public void searchByAuthor() {
-        List<Book> wantedList = bookRepositoryTest.searchBook(null, author);
-        wantedList.forEach(s -> assertEquals(author, s.getAuthor()));
+        List<Library> wantedList = libraryRepositoryTest.searchLibrary(null, address);
+        wantedList.forEach(s -> assertEquals(address, s.getAddress()));
     }
 
     @Test
     public void searchByNameAndAuthors() {
-        List<Book> wantedList = bookRepositoryTest.searchBook(name, author);
+        List<Library> wantedList = libraryRepositoryTest.searchLibrary(name, address);
         assertEquals(name, wantedList.get(0).getName());
-        assertEquals(author, wantedList.get(0).getAuthor());
+        assertEquals(address, wantedList.get(0).getAddress());
     }
 
-    @Test(expected = DuplicateKeyException.class)
-    public void addDuplicateLibrary() {
+    @Test(expected = DataIntegrityViolationException.class)
+    public void addDuplicateBook() {
         bookLibraryRepositoryTest.save(new BookLibrary()
                 .setId(new BookLibraryId()
-                        .setBookId(bookId)
-                        .setLibraryId(libraryId)));
+                        .setBookId(libraryId)
+                        .setLibraryId(bookId)));
         bookLibraryRepositoryTest.save(new BookLibrary()
                 .setId(new BookLibraryId()
-                        .setBookId(bookId)
-                        .setLibraryId(libraryId)));
+                        .setBookId(libraryId)
+                        .setLibraryId(bookId)));
 
     }
 
     @Test(expected = DataIntegrityViolationException.class)
-    public void addNotExistingLibrary() {
+    public void addNotExistingBook() {
         bookLibraryRepositoryTest.save(new BookLibrary()
                 .setId(new BookLibraryId()
-                        .setBookId(bookId)
+                        .setBookId(libraryId)
                         .setLibraryId(wrongId)));
     }
 
     @Test
     public void correctDelete() {
         UUID id2 = UUID.fromString("e5aaccf8-0cca-4f38-a30d-747eac1d2adc");
-        bookRepositoryTest.save(new Book()
+        libraryRepositoryTest.save(new Library()
                 .setId(id2)
                 .setName("correctDelete")
-                .setAuthor("correctDelete")
-                .setPublished(getDate())
-                .setNumberPages(500));
-        bookRepositoryTest.deleteById(id2);
-        assertNull(bookRepositoryTest.getById(id2));
+                .setAddress("correctDelete"));
+        libraryRepositoryTest.deleteById(id2);
+        assertNull(libraryRepositoryTest.getById(id2));
 
     }
 

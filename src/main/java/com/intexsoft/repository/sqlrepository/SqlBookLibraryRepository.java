@@ -48,6 +48,7 @@ public class SqlBookLibraryRepository extends SqlCommonRepository<BookLibrary, B
 
     @Override
     public BookLibrary save(BookLibrary bookLibrary) {
+        bookLibrary.setVersion(1);
         jdbcTemplate.update(sqlSave(), getCommonParametersSource(bookLibrary));
         return bookLibrary;
     }

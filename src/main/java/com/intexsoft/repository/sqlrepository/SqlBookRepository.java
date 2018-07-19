@@ -1,6 +1,7 @@
 package com.intexsoft.repository.sqlrepository;
 
 import com.intexsoft.model.Book;
+import com.intexsoft.model.BookLibrary;
 import com.intexsoft.repository.BookRepository;
 import com.intexsoft.repository.sqlrepository.mapper.CommonMapper;
 import com.intexsoft.repository.sqlrepository.mapper.SqlBookWithLibrariesMapper;
@@ -87,7 +88,10 @@ public class SqlBookRepository extends SqlCommonRepository<Book, UUID> implement
     @Override
     public Book getByIdWithLibraries(UUID id) {
         BinaryOperator<Book> reducedBooks = (book, book2) -> {
-            book.getLibraries().addAll(book2.getLibraries());
+            Set<BookLibrary> set = new HashSet<>();
+            set.addAll(book.getLibraries());
+            set.addAll(book2.getLibraries());
+            book.setLibraries(set);
             return book;
         };
         return getByIdWithJoins(id, sqlGetByIdWithLibraries(), sqlBookWithLibrariesMapper, reducedBooks);

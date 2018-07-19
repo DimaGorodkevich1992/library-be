@@ -81,6 +81,13 @@
         </dependency>
         <!--test -->
         <dependency>
+            <groupId>org.pitest</groupId>
+            <artifactId>pitest-parent</artifactId>
+            <version>1.4.0</version>
+            <type>pom</type>
+        </dependency>
+
+        <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>6.14.2</version>
@@ -107,9 +114,20 @@
                         <schema>public</schema>
                     </schemas>
                 </configuration>
-
             </plugin>
-
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+                    <targetClasses>
+                        <param>com.intexsoft.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>com.intexsoft.*</param>
+                    </targetTests>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
