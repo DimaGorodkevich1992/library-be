@@ -10,10 +10,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.BinaryOperator;
 
 @Component
@@ -29,7 +26,9 @@ public class SqlLibraryRepository extends SqlCommonRepository<Library, UUID> imp
 
     @Override
     public UUID getGeneratedId(Library library) {
-        return UUID.randomUUID();
+        return Objects.equals(library.getId(), null)
+                ? UUID.randomUUID()
+                : library.getId();
     }
 
     private static final String SQL_SELECT =

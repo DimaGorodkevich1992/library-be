@@ -80,8 +80,9 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
         return jdbcTemplate.query(sqlSearch(), sqlParameterSource, mapper);
     }
 
-    @Transactional
+
     @Override
+    @Transactional
     public E update(E e) {
         E var = getById(e.getId());
         synchronized (var) {
@@ -95,7 +96,7 @@ public abstract class SqlCommonRepository<E extends CommonModel<I, E>, I extends
                         e.toString() + " last version " + var.toString());
             }
         }
-        return var;
+        return e;
     }
 
     @Override

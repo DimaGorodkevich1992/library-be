@@ -23,7 +23,9 @@ public class JsonBookRepository extends JsonCommonRepository<Book, UUID> impleme
 
     @Override
     public UUID getGeneratedId(Book book) {
-        return UUID.randomUUID();
+        return Objects.equals(book.getId(), null)
+                ? UUID.randomUUID()
+                : book.getId();
     }
 
     @Override

@@ -13,7 +13,9 @@ public class JpaLibraryRepository extends JpaCommonRepository<Library, UUID> imp
 
     @Override
     public UUID getGeneratedId(Library library) {
-        return UUID.randomUUID();
+        return Objects.equals(library.getId(), null)
+                ? UUID.randomUUID()
+                : library.getId();
     }
 
     protected Class<Library> getModelClass() {

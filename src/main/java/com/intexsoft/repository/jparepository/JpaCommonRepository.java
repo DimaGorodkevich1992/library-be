@@ -26,6 +26,7 @@ public abstract class JpaCommonRepository<E extends CommonModel<I, E>, I extends
     protected abstract Class<E> getModelClass();
 
     @Override
+    @Transactional
     public E getById(I id) {
         return em.find(getModelClass(), id);
 
@@ -39,14 +40,13 @@ public abstract class JpaCommonRepository<E extends CommonModel<I, E>, I extends
         for (String path : fetchCriterias) {
             for (String criteria : path.split(",")) {
                 if (fetchPath == null) {
-                    fetchPath = from.fetch(criteria);
+                    fetchPath = from.fetch(criteria,JoinType.LEFT);
                 } else {
-                    fetchPath = fetchPath.fetch(criteria);
+                    fetchPath = fetchPath.fetch(criteria,JoinType.LEFT);
                 }
             }
         }
-        query.where(cb.equal(from.get("id"), id));
-        em.createQuery(query).getSingleResult();
+        query.select(from).where(cb.equal(from.get("id"), id));
         return em.createQuery(query).getSingleResult();
     }
 
@@ -59,20 +59,21 @@ public abstract class JpaCommonRepository<E extends CommonModel<I, E>, I extends
         return getById(id);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public E update(E e) {
         em.merge(e);
         return getById(e.getId());
     }
 
-    @Transactional
     @Override
+    @Transactional
     public void deleteById(I id) {
         em.remove(getById(id));
     }
 
     @Override
+    @Transactional
     public List<E> search(Map<String, Object> searchCriterias) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
         CriteriaQuery<E> cq = cb.createQuery(getModelClass());

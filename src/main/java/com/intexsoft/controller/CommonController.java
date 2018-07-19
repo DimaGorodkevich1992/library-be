@@ -2,6 +2,8 @@ package com.intexsoft.controller;
 
 import com.intexsoft.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -20,6 +22,18 @@ public abstract class CommonController {
     private static final String TIME_ERROR = "Response time exceeded";
 
     private static final long TIMEOUT = 60000;
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    ResponseEntity<String> acceptDuplicateKeyException(DuplicateKeyException ex) {
+        log.error("Duplicate key exception: ", ex);
+        return status(BAD_REQUEST).body("Duplicate key exception: " + ex.getCause());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    ResponseEntity<String> acceptDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        log.error("Data integrity violation exception: ", ex);
+        return status(BAD_REQUEST).body("Data integrity violation exception: " + ex.getCause());
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     ResponseEntity<String> acceptIllegalArgumentException(IllegalArgumentException ex) {

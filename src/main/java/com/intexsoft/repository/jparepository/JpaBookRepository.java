@@ -13,7 +13,9 @@ public class JpaBookRepository extends JpaCommonRepository<Book, UUID> implement
 
     @Override
     public UUID getGeneratedId(Book book) {
-        return UUID.randomUUID();
+        return Objects.equals(book.getId(), null)
+                ? UUID.randomUUID()
+                : book.getId();
     }
 
     @Override

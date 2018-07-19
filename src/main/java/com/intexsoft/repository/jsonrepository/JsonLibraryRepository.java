@@ -23,7 +23,9 @@ public class JsonLibraryRepository extends JsonCommonRepository<Library, UUID> i
 
     @Override
     public UUID getGeneratedId(Library library) {
-        return UUID.randomUUID();
+        return Objects.equals(library.getId(), null)
+                ? UUID.randomUUID()
+                : library.getId();
     }
 
     @Override
