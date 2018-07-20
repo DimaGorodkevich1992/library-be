@@ -1,5 +1,6 @@
 package com.intexsoft.controller;
 
+import com.intexsoft.exception.DuplicateNameException;
 import com.intexsoft.exception.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -26,6 +27,12 @@ public abstract class CommonController {
     @ExceptionHandler(DuplicateKeyException.class)
     ResponseEntity<String> acceptDuplicateKeyException(DuplicateKeyException ex) {
         log.error("Duplicate key exception: ", ex);
+        return status(BAD_REQUEST).body("Duplicate key exception: " + ex.getCause());
+    }
+
+    @ExceptionHandler(DuplicateNameException.class)
+    ResponseEntity<String> acceptDuplicateNameException(DuplicateNameException ex) {
+        log.error("Duplicate name exception: ", ex);
         return status(BAD_REQUEST).body("Duplicate key exception: " + ex.getCause());
     }
 
