@@ -31,7 +31,8 @@ public class JsonBookLibraryRepository extends JsonCommonRepository<BookLibrary,
         JsonData jsonData = jsonDataHolder.getJsonData();
         boolean isExistBook = isExist(jsonData.getBooks(), s -> Objects.equals(s.getId(), bookLibrary.getId().getBookId()));
         boolean isExistLibrary = isExist(jsonData.getLibraries(), s -> Objects.equals(s.getId(), bookLibrary.getId().getLibraryId()));
-        boolean isExistRelation = isExist(jsonData.getBookLibraryIds(), s -> Objects.equals(s.getLeftEntityId(), bookLibrary.getId().getBookId())
+        boolean isExistRelation = isExist(jsonData.getBookLibraryIds(),
+                s -> Objects.equals(s.getLeftEntityId(), bookLibrary.getId().getBookId())
                 && Objects.equals(s.getRightEntityId(), bookLibrary.getId().getLibraryId()));
         if (isExistRelation) {
             throw new DataIntegrityViolationException("Duplicate relation entity");
