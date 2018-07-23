@@ -123,7 +123,7 @@ public class SqlBookRepositoryTest {
 
     @Test
     public void getByIdWithItemsIncorrectId() {
-        assertNull(bookRepositoryTest.getById(wrongId));
+        assertNull(bookRepositoryTest.getByIdWithLibraries(wrongId));
     }
 
     @Test

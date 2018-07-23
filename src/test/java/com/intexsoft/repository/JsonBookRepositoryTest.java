@@ -17,7 +17,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -37,6 +36,7 @@ import static org.junit.Assert.*;
 @SpringBootTest
 @TestPropertySource("classpath:json-repository.properties")
 public class JsonBookRepositoryTest {
+
     @Autowired
     private JsonBookRepository bookRepositoryTest;
     @Autowired
@@ -127,7 +127,7 @@ public class JsonBookRepositoryTest {
 
     @Test
     public void getByIdWithItemsIncorrectId() {
-        assertNull(bookRepositoryTest.getById(wrongId));
+        assertNull(bookRepositoryTest.getByIdWithLibraries(wrongId));
     }
 
     @Test
@@ -244,6 +244,5 @@ public class JsonBookRepositoryTest {
 
     }
 
-    
 }
 

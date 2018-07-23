@@ -122,7 +122,7 @@ public class JsonLibraryRepositoryTest {
 
     @Test
     public void getByIdWithItemsIncorrectId() {
-        assertNull(libraryRepositoryTest.getById(wrongId));
+        assertNull(libraryRepositoryTest.getByIdWithBooks(wrongId));
     }
 
     @Test

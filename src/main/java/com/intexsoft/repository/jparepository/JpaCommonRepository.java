@@ -2,10 +2,12 @@ package com.intexsoft.repository.jparepository;
 
 import com.intexsoft.model.CommonModel;
 import com.intexsoft.repository.CommonRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.criteria.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+@Slf4j
 public abstract class JpaCommonRepository<E extends CommonModel<I, E>, I extends Serializable> implements CommonRepository<E, I> {
 
     @Override
@@ -40,14 +43,19 @@ public abstract class JpaCommonRepository<E extends CommonModel<I, E>, I extends
         for (String path : fetchCriterias) {
             for (String criteria : path.split(",")) {
                 if (fetchPath == null) {
-                    fetchPath = from.fetch(criteria,JoinType.LEFT);
+                    fetchPath = from.fetch(criteria, JoinType.LEFT);
                 } else {
-                    fetchPath = fetchPath.fetch(criteria,JoinType.LEFT);
+                    fetchPath = fetchPath.fetch(criteria, JoinType.LEFT);
                 }
             }
         }
         query.select(from).where(cb.equal(from.get("id"), id));
-        return em.createQuery(query).getSingleResult();
+        try {
+            return em.createQuery(query).getSingleResult();
+        } catch (NoResultException nre) {
+            log.warn("Object not found: ", nre);
+            return null;
+        }
     }
 
     @Override

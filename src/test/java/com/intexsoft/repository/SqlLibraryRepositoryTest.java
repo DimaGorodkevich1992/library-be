@@ -120,7 +120,7 @@ public class SqlLibraryRepositoryTest {
 
     @Test
     public void getByIdWithItemsIncorrectId() {
-        assertNull(libraryRepositoryTest.getById(wrongId));
+        assertNull(libraryRepositoryTest.getByIdWithBooks(wrongId));
     }
 
     @Test
@@ -131,7 +131,6 @@ public class SqlLibraryRepositoryTest {
     @Test
     public void addLibraryAndGetByIdWithFullItems() {
         UUID bookId2 = UUID.fromString("5fe88d0c-0f75-4add-b8ac-e5d4b61963d1");
-        //   UUID libraryId2 = UUID.fromString("877555ad-7167-40d5-a40f-1ccf45e6b071");
         bookRepositoryTest.save(new Book()
                 .setId(bookId2)
                 .setName(name)

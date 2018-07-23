@@ -126,7 +126,7 @@ public class JpaLibraryRepositoryTest {
 
     @Test
     public void getByIdWithItemsIncorrectId() {
-        assertNull(libraryRepositoryTest.getById(wrongId));
+        assertNull(libraryRepositoryTest.getByIdWithBooks(wrongId));
     }
 
     @Test
